@@ -8,11 +8,11 @@
     border-left-width: 3rem;
 }
 
-.note>div>div:first-child {
+.note>div:first-child>div {
     font-weight: bold;
 }
 
-.note>div>div:first-child::before {
+.note>div:first-child>div::before {
     content: " * ";
 }
 
