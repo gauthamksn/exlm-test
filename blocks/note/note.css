@@ -1,7 +1,5 @@
 .notes {
     margin-top: 1em;
-    background-color: #fff;
-    border-radius: 6px;
     box-shadow: 0 0.5em 1em -0.125em rgba(10, 10, 10, .1), 0 0px 0 1px rgba(10, 10, 10, .02);
     color: #4a4a4a;
     display: block;
@@ -10,8 +8,17 @@
     border-left-width: 3rem;
 }
 
+.notes>div>div:first-child {
+    font-weight: bold;
+}
+
+.notes>div>div:first-child::before {
+    content: " * ";
+}
+
+
 .notes.tip {
-    border-color: rgb(4, 105, 227);
+    border-color: blue;
 }
 
 .notes.important {
