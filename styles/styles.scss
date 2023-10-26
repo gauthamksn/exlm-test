@@ -17,6 +17,7 @@
   --heading-font-family: var(--body-font-family);
   --fixed-font-family: 'Roboto Mono', menlo, consolas, 'Liberation Mono',
     monospace;
+  --spectrum-code-font-family: 'Source Code Pro', 'monaco', monospace;
 
   /* default font sizes */
   --spectrum-font-size-50: 11px;
@@ -42,9 +43,11 @@
   --exlm-font-size-p: 16px;
 
   /* font weight */
+  --font-weight-900: 900;
   --font-weight-700: 700;
   --font-weight-600: 600;
   --font-weight-400: 400;
+  --spectrum-extra-bold-font-weight: 800;
 
   /* line height */
   --spectrum-line-height-xxxl: 57.2px;
@@ -260,6 +263,19 @@
   --spectrum-yellow-1100: #5b4300;
   --spectrum-yellow-1200: #483300;
   --spectrum-yellow-1300: #362500;
+  --spectrum-global-color-gray-900-rgb: 0, 0, 0;
+
+  /* spectrum spacing */
+  --spectrum-spacing-400: 24px;
+  --spectrum-spacing-500: 32px;
+  --spectrum-spacing-600: 40px;
+  --spectrum-spacing-700: 48px;
+
+  /* mini toc spectrum vars */
+  --spectrum-sidenav-item-background-color-hover: ButtonFace;
+  --spectrum-alias-highlight-hover: rgba(0, 0, 0, 0.06);
+  --spectrum-sidenav-item-text-color-hover: ButtonText;
+  --spectrum-alias-text-color-hover: var(--spectrum-global-color-gray-900);
 
   /* Non-Spectrum custom colors */
   --non-spectrum-eerie-black: #1e1e1e;
@@ -271,6 +287,12 @@
   --non-spectrum-grey: #4a4a4a;
   --non-spectrum-grey-updated: #6e6e6e;
   --non-spectrum-link: #378ef0;
+  --non-spectrum-navy-blue: #1473e6;
+  --non-spectrurm-article-light-gray: #d3d3d3;
+  --non-spectrurm-article-dark-gray: #505050;
+
+  /* rgba transparent values */
+  --spectrum-button-background-color-default: rgb(0 0 0 / 0%);
 
   /* Spacing Tokens */
   --space-token-xxs: 8px;
@@ -304,8 +326,12 @@
   src: local('Arial');
 }
 
+html {
+  -webkit-font-smoothing: antialiased;
+}
+
 body {
-  font-size: var(--spectrum-body-size-l);
+  font-size: var(--spectrum-body-size-s);
   margin: 0;
   font-family: var(--body-font-family);
   line-height: 1.6;
@@ -331,10 +357,7 @@ h6 {
 }
 
 dl,
-ol,
-ul,
-pre,
-blockquote {
+pre {
   margin-top: 1em;
   margin-bottom: 1em;
 }
@@ -356,6 +379,16 @@ samp {
 code,
 samp {
   padding: 0.125em;
+}
+
+code:not([class^='language-']) {
+  font-family: var(--spectrum-code-font-family);
+  font-size: var(--spectrum-body-size-s);
+  background-color: var(--spectrum-gray-100);
+  padding: 4px;
+  border: 1px solid var(--spectrum-gray-300);
+  border-radius: 4px;
+  line-height: 21px;
 }
 
 pre {
@@ -443,10 +476,8 @@ main input:hover {
 }
 
 main blockquote {
-  font-style: italic;
-  margin: 3rem;
-  text-indent: -1rem;
-  hanging-punctuation: first;
+  margin: 0;
+  color: var(--non-spectrum-grey);
 }
 
 main blockquote p::before {
@@ -457,6 +488,26 @@ main blockquote p::before {
 main blockquote p::after {
   content: '”';
   line-height: 0;
+}
+
+ol > li > p {
+  margin-bottom: 8px;
+}
+
+ul > li > p {
+  margin-bottom: 8px;
+}
+
+main blockquote > p:not(:last-child) {
+  margin-bottom: 8px;
+}
+
+ol > li > blockquote > p:last-child {
+  margin-bottom: 0;
+}
+
+ul > li > blockquote > p:last-child {
+  margin-bottom: 0;
 }
 
 main img {
@@ -487,7 +538,7 @@ main .section {
 }
 
 @include breakpoint(desktop) {
-  .section > div {
+  .section>div {
     max-width: 1200px;
     margin: auto;
   }
@@ -498,6 +549,169 @@ main .section.highlight {
   background-color: var(--highlight-background-color);
 }
 
-.section > .default-content-wrapper:last-child > p:last-child {
+.section>.default-content-wrapper:last-child>p:last-child {
   margin-bottom: 0;
+}
+
+ol {
+  @include text-styles(
+    $margin-bottom: 2em,
+    $margin-top: 0,
+    $color: var(--non-spectrum-grey),
+    $line-height: 24px
+  );
+
+  margin-left: 28px;
+  list-style-type: decimal;
+  padding: 0;
+}
+
+ol > li:not(:last-child) {
+  margin-bottom: 14px;
+  color: inherit;
+}
+
+ul {
+  @include text-styles(
+    $margin-top: 1em,
+    $margin-bottom: 2em,
+    $line-height: 24px,
+    $color: var(--non-spectrum-grey)
+  );
+
+  margin-left: 28px;
+  list-style-type: disc;
+  padding: 0;
+}
+
+ul > li:not(:last-child) {
+  margin-bottom: 0.875em;
+  color: inherit;
+}
+
+/* three column layout */
+main.three-col-layout {
+  width: 100%;
+  display: grid;
+  gap: 8px;
+  grid-template-columns: 20% 1fr 20%;
+
+  .content-section {
+    width: auto;
+    overflow: auto;
+  }
+
+  & > .rail-section {
+    grid-column: 2/3;
+    position: relative;
+    display: flex;
+    gap: 8px;
+
+    .rail-section-wrapper {
+      overflow: auto;
+      width: 100%;
+      display: none;
+      margin: 0;
+    }
+
+    .rail-section-toggler {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+    }
+
+    &-expanded {
+      .rail-section-wrapper {
+        display: block;
+      }
+
+      .rail-section-toggler {
+        .icon-rail {
+          transform: none;
+        }
+      }
+    }
+
+    &.rail-section-right {
+      grid-column: 3/4;
+      flex-direction: row-reverse;
+
+      .rail-section-toggler {
+        left: 0;
+
+        .icon-rail {
+          transform: none;
+        }
+      }
+    }
+
+    &.rail-section-left {
+      grid-column: 1/2;
+
+      .rail-section-toggler {
+        right: 20px;
+
+        .icon-rail {
+          transform: rotate(180deg);
+        }
+      }
+
+      &.rail-section-expanded {
+        .rail-section-toggler {
+          .icon-rail {
+            transform: none;
+          }
+        }
+      }
+    }
+
+    &.rail-section-expanded {
+      &.rail-section-right {
+        .rail-section-toggler {
+          .icon-rail {
+            transform: rotate(180deg);
+          }
+        }
+      }
+    }
+
+    &.rail-hidden {
+      display: none;
+    }
+  }
+}
+
+main .rail-mobile-section {
+  position: relative;
+  padding: 0;
+  text-align: center;
+
+  .rail-mobile-wrapper {
+    position: absolute;
+    display: none;
+    background-color: var(--spectrum-gray-50);
+    box-shadow:
+      0 0.5em 1em -0.125em #0a0a0a1f,
+      0 0 0 1px #0a0a0a17;
+    padding: 12px 24px;
+    border-radius: 8px;
+    left: 5%;
+    top: 60px;
+    width: 80%;
+
+    &-visible {
+      display: block;
+    }
+  }
+}
+
+main button.rail-mobile-button {
+  border-radius: 4px;
+  background-color: var(--spectrum-gray-50);
+  color: var(--spectrum-gray-800);
+  border: 1px solid var(--spectrum-gray-400);
+  width: 72vw;
+  height: 48px;
+  margin: 0;
+  text-align: left;
 }
