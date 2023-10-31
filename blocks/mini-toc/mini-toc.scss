@@ -1,28 +1,28 @@
-.mini-toc-container .is-hidden {
-  display: none;
-}
+@import '../../styles/sass/breakpoints';
 
-@media (max-width: 899px) {
-  .mini-toc-container {
-    display: none;
+.mini-toc-container {
+  display: none;
+
+  @include breakpoint(desktop) {
+    display: block;
   }
 }
 
 .mini-toc-wrapper {
   padding-left: 0;
-  padding-top: 46px;
+  padding-top: 8px;
   flex: none;
-  width: 19.5%;
+  width: 100%;
   position: sticky;
   top: 32px;
   overflow: visible;
 }
 
 .mini-toc-wrapper .mini-toc {
-  margin-top: var(--spectrum-spacing-200);
+  margin-top: 56px;
   font-size: var(--spectrum-font-size-50);
   font-weight: var(--spectrum-extra-bold-font-weight);
-  padding-left: 18px;
+  padding-left: 0;
   overflow: hidden;
 
   .scrollable-div {
@@ -40,6 +40,7 @@
   font-size: var(--spectrum-font-size-50);
   font-weight: var(--spectrum-extra-bold-font-weight);
   text-transform: uppercase;
+  margin: 0;
 }
 
 .mini-toc-wrapper .mini-toc ul {
@@ -110,7 +111,7 @@
     }
 
     a.is-active {
-      font-weight: var(--spectrum-font-size-100);
+      font-weight: var(--font-weight-600);
       background-color: var(
         --spectrum-sidenav-item-background-color-hover,
         var(--spectrum-alias-highlight-hover)
