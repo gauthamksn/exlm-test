@@ -1,61 +1,94 @@
-'use strict';
-
 export const timers = new Map();
 
+// eslint-disable-next-line
+export function debounce(id = '', fn = () => void 0, ms = 250) {
+  if (id.length > 0) {
+    if (timers.has(id)) {
+      clearTimeout(timers.get(id));
+    }
+
+    timers.set(
+      id,
+      setTimeout(() => {
+        timers.delete(id);
+        fn();
+      }, ms),
+    );
+  }
+}
+
 export function setLevels(val = 2) {
-    const selectors = [];
+  const selectors = [];
 
-    if (val > 6) {
-        val = 6;
-    }
+  if (val > 6) {
+    // eslint-disable-next-line no-param-reassign
+    val = 6;
+  }
 
-    for (let i = val; i >= 1; i--) {
-        selectors.push(`h${i + 1}:not(#lists-documentation)`);
-    }
+  for (let i = val; i >= 1; i -= 1) {
+    selectors.push(`h${i + 1}:not(#lists-documentation)`);
+  }
 
-    return selectors.join(',');
+  return selectors.join(',');
 }
 
 export function highlight(replace = false) {
-    const render = window.requestAnimationFrame;
-    const ctx = document.querySelector('.mini-toc'),
-        levels = document.querySelector('meta[name="mini-toc-levels"]'),
-        mtocScroll = ctx.querySelectorAll('a').length > 10 ? true : false;
+  const render = window.requestAnimationFrame;
+  const ctx = document.querySelector('.mini-toc');
+  const levels = document.querySelector('meta[name="mini-toc-levels"]');
+  const mtocScroll = ctx.querySelectorAll('a').length > 10;
 
-    if (ctx !== null) {
-        const top = window.scrollY,
-            headers = Array.from(document.querySelector('main').querySelectorAll(setLevels(levels !== null && parseInt(levels.content, 10) > 0 ? parseInt(levels.content, 10) : void 0))).filter(i => i.id.length > 0),
-            anchors = Array.from(ctx.querySelectorAll('a'));
-        let el;
+  if (ctx !== null) {
+    const top = window.scrollY;
+    const headers = Array.from(
+      document
+        .querySelector('main')
+        .querySelectorAll(
+          setLevels(levels !== null && parseInt(levels.content, 10) > 0 ? parseInt(levels.content, 10) : undefined),
+        ),
+    ).filter((i) => i.id.length > 0);
+    const anchors = Array.from(ctx.querySelectorAll('a'));
+    let el;
 
-        for (const [idx, i] of headers.entries()) {
-            if (parseInt(i.offsetTop, 10) + parseInt(i.offsetHeight, 10) >= top) {
-                el = anchors[idx];
-                break;
-            }
-        }
-
-        if (el !== void 0) {
-            render(() => {
-                ctx.querySelectorAll('a.is-active').forEach(i => i.classList.remove('is-active'));
-                el.classList.add('is-active');
-
-                if (mtocScroll) {
-                    ctx.scroll(0, el.offsetTop - ctx.offsetTop);
-                }
-
-                if (replace) {
-                    history.replaceState({}, '', el.href);
-                }
-            });
-        }
+    // eslint-disable-next-line no-restricted-syntax
+    for (const [idx, i] of headers.entries()) {
+      if (parseInt(i.offsetTop, 10) + parseInt(i.offsetHeight, 10) >= top) {
+        el = anchors[idx];
+        break;
+      }
     }
+
+    if (el !== undefined) {
+      render(() => {
+        ctx.querySelectorAll('a.is-active').forEach((i) => i.classList.remove('is-active'));
+        el.classList.add('is-active');
+
+        const scrollOptions = {
+          top: el.offsetTop - ctx.offsetTop,
+          behavior: 'smooth',
+        };
+
+        if (mtocScroll) {
+          ctx.scroll(scrollOptions);
+        }
+
+        const scrollableDivBlock = ctx.querySelector('.scrollable-div');
+        const anchorTopPos = el.offsetTop;
+        el.classList.add('is-active');
+        scrollableDivBlock.scrollTop = anchorTopPos - 30;
+
+        if (replace) {
+          window.history.replaceState({}, '', el.href);
+        }
+      });
+    }
+  }
 }
 
 export function hashFragment(arg = '') {
-    const url = new URL(location.href),
-        lhash = arg.replace(/^#/, '');
+  const url = new URL(window.location.href);
+  const lhash = arg.replace(/^#/, '');
 
-    url.hash = lhash.length > 0 ? lhash : arg;
-    history.replaceState({}, '', url.href);
+  url.hash = lhash.length > 0 ? lhash : arg;
+  window.history.replaceState({}, '', url.href);
 }

@@ -1,7 +1,4 @@
 export default function decorate(block) {
-  const createdForUl = block.querySelector('ul');
-
-  if (createdForUl) {
-    createdForUl.classList.add('meta-created-for');
-  }
+  const kids = block.querySelector(':scope > div > div').innerHTML;
+  if (kids) block.innerHTML = kids;
 }
