@@ -14,9 +14,10 @@ import {
   loadCSS,
   decorateButtons,
   getMetadata,
+  loadScript,
 } from './lib-franklin.js';
 
-const LCP_BLOCKS = []; // add your LCP blocks to the list
+const LCP_BLOCKS = ['marquee']; // add your LCP blocks to the list
 
 /**
  * Builds hero block and prepends to main in a new section.
@@ -26,11 +27,7 @@ function buildHeroBlock(main) {
   const h1 = main.querySelector('h1');
   const picture = main.querySelector('picture');
   // eslint-disable-next-line no-bitwise
-  if (
-    h1 &&
-    picture &&
-    h1.compareDocumentPosition(picture) & Node.DOCUMENT_POSITION_PRECEDING
-  ) {
+  if (h1 && picture && h1.compareDocumentPosition(picture) & Node.DOCUMENT_POSITION_PRECEDING) {
     const section = document.createElement('div');
     section.append(buildBlock('hero', { elems: [picture, h1] }));
     main.prepend(section);
@@ -43,8 +40,7 @@ function buildHeroBlock(main) {
 async function loadFonts() {
   await loadCSS(`${window.hlx.codeBasePath}/styles/fonts.css`);
   try {
-    if (!window.location.hostname.includes('localhost'))
-      sessionStorage.setItem('fonts-loaded', 'true');
+    if (!window.location.hostname.includes('localhost')) sessionStorage.setItem('fonts-loaded', 'true');
   } catch (e) {
     // do nothing
   }
@@ -196,18 +192,59 @@ async function loadEager(doc) {
   }
 }
 
+export const locales = new Map([
+  ['de', 'de_DE'],
+  ['en', 'en_US'],
+  ['es', 'es_ES'],
+  ['fr', 'fr_FR'],
+  ['it', 'it_IT'],
+  ['ja', 'ja_JP'],
+  ['ko', 'ko_KO'],
+  ['pt-BR', 'pt_BR'],
+  ['zh-Hans', 'zh_HANS'],
+]);
+
+let imsLoaded;
+export async function loadIms() {
+  imsLoaded =
+    imsLoaded ||
+    new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => reject(new Error('IMS timeout')), 5000);
+      window.adobeid = {
+        client_id: 'ExperienceLeague_Dev',
+        scope:
+          'AdobeID,additional_info.company,additional_info.ownerOrg,avatar,openid,read_organizations,read_pc,session,account_cluster.read',
+        locale: locales.get(document.querySelector('html').lang) || locales.get('en'),
+        debug: false,
+        onReady: (args) => {
+          // eslint-disable-next-line no-console
+          console.log('Adobe IMS Ready!', args);
+          resolve({
+            ...args,
+            // eslint-disable-next-line no-undef
+            adobeIMS,
+          });
+          clearTimeout(timeout);
+        },
+        onError: reject,
+      };
+      loadScript('https://auth.services.adobe.com/imslib/imslib.min.js');
+    });
+  return imsLoaded;
+}
+
 /**
  * Loads everything that doesn't need to be delayed.
  * @param {Element} doc The container element
  */
 async function loadLazy(doc) {
   const main = doc.querySelector('main');
+  loadIms(); // start it early, asyncronously
   await loadBlocks(main);
 
   const { hash } = window.location;
   const element = hash ? doc.getElementById(hash.substring(1)) : false;
   if (hash && element) element.scrollIntoView();
-
   loadHeader(doc.querySelector('header'));
   loadFooter(doc.querySelector('footer'));
 
@@ -241,20 +278,26 @@ export function createTag(tag, attributes, html) {
   return el;
 }
 
+/**
+ * creates an element from html string
+ * @param {string} html
+ * @returns {HTMLElement}
+ */
+export function htmlToElement(html) {
+  const template = document.createElement('template');
+  const trimmedHtml = html.trim(); // Never return a text node of whitespace as the result
+  template.innerHTML = trimmedHtml;
+  return template.content.firstElementChild;
+}
+
 export function loadPrevNextBtn() {
   const mainDoc = document.querySelector('main > div:nth-child(1)');
   if (!mainDoc) return;
 
   const prevPageMeta = document.querySelector('meta[name="prev-page"]');
   const nextPageMeta = document.querySelector('meta[name="next-page"]');
-  const prevPageMetaContent = prevPageMeta
-    ?.getAttribute('content')
-    .trim()
-    .split('.html')[0];
-  const nextPageMetaContent = nextPageMeta
-    ?.getAttribute('content')
-    .trim()
-    .split('.html')[0];
+  const prevPageMetaContent = prevPageMeta?.getAttribute('content').trim().split('.html')[0];
+  const nextPageMetaContent = nextPageMeta?.getAttribute('content').trim().split('.html')[0];
   const PREV_PAGE = 'Previous page';
   const NEXT_PAGE = 'Next page';
 
@@ -309,21 +352,20 @@ function loadDelayed() {
   // eslint-disable-next-line import/no-cycle
   window.setTimeout(() => import('./delayed.js'), 3000);
   // load anything that can be postponed to the latest here
+  if (isDocPage()) window.setTimeout(() => import('./feedback/feedback.js'), 3000);
 }
 
 /**
  * Custom - Loads the right and left rails for doc pages only.
  */
-function loadRails() {
-  requestIdleCallback(async () => {
-    if (isDocPage()) {
-      loadCSS(`${window.hlx.codeBasePath}/scripts/rails/rails.css`);
-      const mod = await import('./rails/rails.js');
-      if (mod.default) {
-        await mod.default();
-      }
+async function loadRails() {
+  if (isDocPage()) {
+    loadCSS(`${window.hlx.codeBasePath}/scripts/rails/rails.css`);
+    const mod = await import('./rails/rails.js');
+    if (mod.default) {
+      await mod.default();
     }
-  });
+  }
 }
 
 async function loadPage() {

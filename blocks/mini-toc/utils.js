@@ -1,5 +1,22 @@
 export const timers = new Map();
 
+// eslint-disable-next-line
+export function debounce(id = '', fn = () => void 0, ms = 250) {
+  if (id.length > 0) {
+    if (timers.has(id)) {
+      clearTimeout(timers.get(id));
+    }
+
+    timers.set(
+      id,
+      setTimeout(() => {
+        timers.delete(id);
+        fn();
+      }, ms),
+    );
+  }
+}
+
 export function setLevels(val = 2) {
   const selectors = [];
 
@@ -27,11 +44,7 @@ export function highlight(replace = false) {
       document
         .querySelector('main')
         .querySelectorAll(
-          setLevels(
-            levels !== null && parseInt(levels.content, 10) > 0
-              ? parseInt(levels.content, 10)
-              : undefined,
-          ),
+          setLevels(levels !== null && parseInt(levels.content, 10) > 0 ? parseInt(levels.content, 10) : undefined),
         ),
     ).filter((i) => i.id.length > 0);
     const anchors = Array.from(ctx.querySelectorAll('a'));
@@ -47,14 +60,22 @@ export function highlight(replace = false) {
 
     if (el !== undefined) {
       render(() => {
-        ctx
-          .querySelectorAll('a.is-active')
-          .forEach((i) => i.classList.remove('is-active'));
+        ctx.querySelectorAll('a.is-active').forEach((i) => i.classList.remove('is-active'));
         el.classList.add('is-active');
 
+        const scrollOptions = {
+          top: el.offsetTop - ctx.offsetTop,
+          behavior: 'smooth',
+        };
+
         if (mtocScroll) {
-          ctx.scroll(0, el.offsetTop - ctx.offsetTop);
+          ctx.scroll(scrollOptions);
         }
+
+        const scrollableDivBlock = ctx.querySelector('.scrollable-div');
+        const anchorTopPos = el.offsetTop;
+        el.classList.add('is-active');
+        scrollableDivBlock.scrollTop = anchorTopPos - 30;
 
         if (replace) {
           window.history.replaceState({}, '', el.href);

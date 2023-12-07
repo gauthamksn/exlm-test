@@ -7,18 +7,16 @@
   --link-hover-color: #136ff6;
   --background-color: #fff;
   --overlay-background-color: #eee;
-  --highlight-background-color: #ccc;
+  --highlight-background-color: #f8f8f8;
   --text-color: #000;
   --footer-background-color: #fafafa;
   --footer-border-color: #e1e1e1;
 
   /* fonts */
-  --body-font-family: 'Adobe Clean', adobe-clean, 'Source Sans Pro',
-    -apple-system, system-ui, 'Segoe UI', roboto, ubuntu, 'Trebuchet MS',
-    'Lucida Grande', sans-serif;
+  --body-font-family: 'Adobe Clean', adobe-clean, 'Source Sans Pro', -apple-system, system-ui, 'Segoe UI', roboto,
+    ubuntu, 'Trebuchet MS', 'Lucida Grande', sans-serif;
   --heading-font-family: var(--body-font-family);
-  --fixed-font-family: 'Roboto Mono', menlo, consolas, 'Liberation Mono',
-    monospace;
+  --fixed-font-family: 'Roboto Mono', menlo, consolas, 'Liberation Mono', monospace;
   --spectrum-code-font-family: 'Source Code Pro', 'monaco', monospace;
 
   /* default font sizes */
@@ -284,7 +282,7 @@
   --non-spectrum-viridian: #007e50;
   --non-spectrum-grey: #4a4a4a;
   --non-spectrum-grey-updated: #6e6e6e;
-  --non-spectrum-link: #485fc7; /* this provides better contrast for a11y */
+  --non-spectrum-link: #0265dc;
   --non-spectrum-navy-blue: #1473e6;
   --non-spectrum-article-light-gray: #d3d3d3;
   --non-spectrum-article-dark-gray: #505050;
@@ -300,6 +298,22 @@
   --non-spectrum-scrollbar-thumb: rgba(0 0 0 / 50%);
   --non-spectrum-raisin-black: #222;
   --non-spectrum-silver: #f5f5f5;
+  --non-spectrum-neo-blue: #0265dc;
+  --non-spectrum-royal-blue: #0d66d0;
+  --non-spectrum-light-coral: #73b53a;
+  --non-spectrum-dim-gray: #747474;
+  --non-spectrum-dim-orange: #e2a43e;
+  --non-spectrum-victoria-blue: #46a8f7;
+  --non-spectrum-lime-green: #12805c;
+  --non-spectrum-royal-crest: #f46700;
+  --non-spectrum-dark-princess-pink: #d83790;
+  --non-spectrum-frost-bite: #962af0;
+  --non-spectrum-cyan-paprika: #004396;
+  --non-spectrum-venetian-green: #00c001;
+  --non-spectrum-bright-cyan: #00a6aa;
+  --non-spectrum-azure-blue: #378ef0;
+  --non-spectrum-silver-mist: #d2d2d2;
+  --non-spectrum-link-blue: #378ef0;
   --non-spectrum-max-width: 1440px;
 
   /* rgba transparent values */
@@ -378,6 +392,7 @@ body.appear {
 
 header {
   height: var(--nav-height);
+  border-bottom: 1px solid var(--non-spectrurm-whisper-gray);
 }
 
 dl,
@@ -399,12 +414,7 @@ ul {
   padding: 0;
 
   > li {
-    @include text-styles(
-      $margin-top: 1em,
-      $margin-bottom: 2em,
-      $line-height: 27px,
-      $color: var(--non-spectrum-grey)
-    );
+    @include text-styles($margin-top: 1em, $margin-bottom: 2em, $line-height: 27px, $color: var(--non-spectrum-grey));
 
     > p {
       margin-bottom: 8px;
@@ -418,12 +428,7 @@ ol {
   padding: 0;
 
   > li {
-    @include text-styles(
-      $margin-bottom: 2em,
-      $margin-top: 0,
-      $color: var(--non-spectrum-grey),
-      $line-height: 27px
-    );
+    @include text-styles($margin-bottom: 2em, $margin-top: 0, $color: var(--non-spectrum-grey), $line-height: 27px);
 
     > p {
       margin-bottom: 8px;
@@ -607,7 +612,7 @@ img {
 }
 
 .section {
-  padding: 30px 2px;
+  padding: 30px 16px;
 
   &.article-metadata-createdby-container h1 {
     line-height: var(--spectrum-line-height-xxl);
@@ -624,6 +629,16 @@ img {
   /* section metadata */
   &.highlight {
     background-color: var(--highlight-background-color);
+  }
+
+  > div {
+    /* limit block wrappers max width */
+    max-width: var(--non-spectrum-max-width);
+    margin: auto;
+  }
+
+  @include breakpoint(tablet) {
+    padding: 30px 32px 32px;
   }
 }
 
@@ -659,14 +674,24 @@ img {
     --exlm-line-height-h6: 18.2px;
   }
 
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    code:not([class^='language-']) {
+      font-size: inherit;
+      line-height: 36px;
+    }
+  }
+
   code:not([class^='language-']) {
     font-family: var(--spectrum-code-font-family);
-    font-size: var(--spectrum-body-size-s);
-    background-color: var(--spectrum-gray-100);
-    padding: 4px;
-    border: 1px solid var(--spectrum-gray-300);
-    border-radius: 4px;
+    font-size: var(--spectrum-font-size-100);
+    background-color: unset;
     line-height: 21px;
+    padding: 0;
   }
 
   pre {
@@ -687,36 +712,24 @@ img {
   }
 
   ol {
-    @include text-styles(
-      $margin-bottom: 2em,
-      $margin-top: 0,
-      $color: var(--non-spectrum-grey),
-      $line-height: 24px
-    );
+    @include text-styles($margin-bottom: 2em, $margin-top: 0, $color: var(--non-spectrum-grey), $line-height: 24px);
   }
 
   ul {
-    @include text-styles(
-      $margin-top: 1em,
-      $margin-bottom: 2em,
-      $line-height: 24px,
-      $color: var(--non-spectrum-grey)
-    );
+    @include text-styles($margin-top: 1em, $margin-bottom: 2em, $line-height: 24px, $color: var(--non-spectrum-grey));
   }
 
   main {
     width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 8px;
     margin: 0 auto;
     padding: 0 46px;
     box-sizing: border-box;
     max-width: 1700px;
 
     > div {
-      padding: 30px var(--spectrum-spacing-500) var(--spectrum-spacing-500)
-        var(--spectrum-spacing-500);
+      padding: 30px var(--spectrum-spacing-500) var(--spectrum-spacing-500) var(--spectrum-spacing-500);
       box-sizing: border-box;
 
       &.section {
@@ -736,7 +749,6 @@ img {
 
     > div:nth-child(2) {
       order: 1;
-      gap: 8px;
       height: 70px; // predefined height to help with CLS
       padding: 32px 10px 10px; // predefined padding to help with CLS
       .rail-content {
@@ -746,22 +758,41 @@ img {
 
     > div:last-child {
       order: 3;
+      padding: 32px 10px 0 0;
+    }
+
+    @include breakpoint(tablet) {
+      > .div:nth-child(1) {
+        position: relative;
+        padding: 0;
+        text-align: center;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      > div:last-child {
+        padding: 32px 10px 10px 0;
+      }
     }
 
     @include breakpoint(desktop) {
       flex-direction: row;
+      padding: 0;
 
       // doc
       > div:first-child {
         order: 2;
         overflow: auto;
         flex: 1 1 0;
+        padding: 54px 37px 50px 50px;
       }
 
       // toc
       > div:nth-child(2) {
         order: 1;
         width: 20%;
+        padding: 46px 10px 10px;
 
         .rail-content {
           display: block;
@@ -773,19 +804,13 @@ img {
         order: 3;
         width: 20%;
         position: relative;
-        display: flex;
+        display: block;
         gap: 8px;
-      }
-    }
+        padding: 46px 10px 10px 0;
 
-    @include breakpoint(tablet) {
-      > .div:nth-child(1) {
-        position: relative;
-        padding: 0;
-        text-align: center;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        &.mini-toc-container {
+          display: flex;
+        }
       }
     }
   }
