@@ -1,4 +1,5 @@
-import { debounce, highlight, setLevels, hashFragment } from './utils.js';
+import { debounce, fetchLanguagePlaceholders } from '../../scripts/scripts.js';
+import { highlight, setLevels, hashFragment } from './utils.js';
 
 function setPadding(arg = '') {
   const num = parseInt(arg.split('')[1], 10);
@@ -17,7 +18,14 @@ function headerExclusions(header) {
 }
 
 export default async function decorate() {
-  const miniTOCHeading = 'ON THIS PAGE';
+  let placeholders = {};
+  try {
+    placeholders = await fetchLanguagePlaceholders();
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error('Error fetching placeholders:', err);
+  }
+  const miniTOCHeading = placeholders?.onThisPage;
   const render = window.requestAnimationFrame;
   const ctx = document.querySelector('.mini-toc');
   const levels = document.querySelector('meta[name="mini-toc-levels"]');

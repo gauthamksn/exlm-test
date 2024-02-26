@@ -1,5 +1,5 @@
 /* API and Component Mapping Keys */
-const CONTENT_TYPES = Object.freeze({
+export const CONTENT_TYPES = Object.freeze({
   COURSE: {
     MAPPING_KEY: 'course',
     LABEL: 'Course',
@@ -10,7 +10,7 @@ const CONTENT_TYPES = Object.freeze({
   },
   EVENT: {
     MAPPING_KEY: 'event',
-    LABEL: 'Event',
+    LABEL: 'On-Demand Event',
   },
   COMMUNITY: {
     MAPPING_KEY: 'community',
@@ -22,7 +22,7 @@ const CONTENT_TYPES = Object.freeze({
   },
   INSTRUCTOR_LED_TRANING: {
     MAPPING_KEY: 'instructor-led-training',
-    LABEL: 'Instructor Led Training',
+    LABEL: 'Instructor-Led',
   },
   CERTIFICATION: {
     MAPPING_KEY: 'certification',
@@ -38,4 +38,49 @@ const CONTENT_TYPES = Object.freeze({
   },
 });
 
-export default CONTENT_TYPES;
+export const COVEO_SORT_OPTIONS = Object.freeze({
+  RELEVANCE: 'relevancy',
+  MOST_RECENT: 'date descending',
+  MOST_POPULAR: '@el_view_count descending',
+});
+
+export const ROLE_OPTIONS = Object.freeze({
+  ADMIN: 'Admin',
+  DEVELOPER: 'Developer',
+  LEADER: 'Leader',
+  USER: 'User',
+});
+
+export const COMMUNITY_SEARCH_FACET = Object.freeze([
+  {
+    value: 'Questions',
+    state: 'selected',
+  },
+  {
+    value: 'Discussions',
+    state: 'selected',
+  },
+  {
+    value: 'Ideas',
+    state: 'selected',
+  },
+  {
+    value: 'Blogs',
+    state: 'selected',
+  },
+]);
+
+export const RECOMMENDED_COURSES_CONSTANTS = Object.freeze({
+  IN_PROGRESS: {
+    MAPPING_KEY: 'inprogress-courses',
+    LABEL: 'In Progress courses',
+  },
+  RECOMMENDED: {
+    MAPPING_KEY: 'recommended-courses',
+    LABEL: 'Recommended courses',
+  },
+  PATHS: {
+    MAPPING_KEY: 'paths',
+    LABEL: 'Paths',
+  },
+});

@@ -1,19 +1,12 @@
 import { decorateIcons } from '../../scripts/lib-franklin.js';
+import { getPathDetails } from '../../scripts/scripts.js';
 
-const CONFIG = {
-  basePath: '/fragments/en',
-  footerPath: '/footer/footer.plain.html',
-  languagePath: '/languages/languages.plain.html',
-};
+const languageModule = import('../../scripts/language.js');
 
-// Utility function for http call
-const getHTMLData = async (url) => {
-  const response = await fetch(url);
-  if (response.ok) {
-    const responseData = response.text();
-    return responseData;
-  }
-  throw new Error(`${url} not found`);
+// fetch fragment html
+const fetchFragment = async (rePath, lang = 'en') => {
+  const response = await fetch(`/fragments/${lang}/${rePath}.plain.html`);
+  return response.text();
 };
 
 function decorateMenu(footer) {
@@ -63,48 +56,22 @@ function extractDomain(domain) {
   return match?.[1] || '';
 }
 
-function hideLangSelectionDropdown(e) {
-  const langDropdown = document.querySelector('.footer .dropdown-menu.dropdown-menu-active');
-  if (langDropdown && (!e.target || (e.target && !langDropdown.contains(e.target)))) {
-    langDropdown.classList.remove('dropdown-menu-active');
-    document.removeEventListener('click', hideLangSelectionDropdown);
-  }
-}
-
-function showLangSelectionDropdown(e) {
-  const langDropdownBase = document.querySelector('.footer .language-nav');
-  const langDropdown = langDropdownBase?.querySelector('.dropdown-menu');
-  if (langDropdown) {
-    e.stopPropagation();
-    langDropdown.classList.add('dropdown-menu-active');
-    document.addEventListener('click', hideLangSelectionDropdown);
-  }
-}
-
 async function decorateSocial(footer) {
   const languageSelector = footer.querySelector('.language-selector');
   const social = footer.querySelector('.social');
   const groupDiv = document.createElement('div');
   groupDiv.classList.add('footer-lang-social');
-  // fetch language content
-  const languagePath = `${CONFIG.basePath}${CONFIG.languagePath}`;
-  const html = await getHTMLData(languagePath);
-  if (html) {
-    const frag = document.createElement('div');
-    frag.innerHTML = html;
-    const languageNav = frag.querySelector('.language-nav');
-    const dropdownMenu = languageNav.firstElementChild;
-    const dropdownMenuContent = dropdownMenu.firstElementChild;
-    dropdownMenu.classList.add('dropdown-menu');
-    dropdownMenuContent.classList.add('dropdown-content');
-    const langSelectorButton = languageSelector.firstElementChild;
-    langSelectorButton.classList.add('language-selector-button');
-    const icon = document.createElement('span');
-    icon.classList.add('icon', 'icon-globegrid');
-    langSelectorButton.appendChild(icon);
-    languageSelector.appendChild(languageNav);
-    langSelectorButton.addEventListener('click', showLangSelectionDropdown);
-  }
+  // build language popover
+  const { buildLanguagePopover } = await languageModule;
+  const { popover } = await buildLanguagePopover('top');
+
+  const langSelectorButton = languageSelector.firstElementChild;
+  langSelectorButton.classList.add('language-selector-button');
+  const icon = document.createElement('span');
+  icon.classList.add('icon', 'icon-globegrid');
+  langSelectorButton.appendChild(icon);
+  languageSelector.appendChild(popover);
+
   groupDiv.appendChild(languageSelector);
   groupDiv.appendChild(social);
   const elem = footer.children[0];
@@ -200,15 +167,13 @@ function handleSocialIconStyles(footer) {
  */
 export default async function decorate(block) {
   // fetch footer content
-  const footerPath = `${CONFIG.basePath}${CONFIG.footerPath}`;
-  const resp = await getHTMLData(footerPath);
+  const { lang } = getPathDetails();
+  const footerFragment = await fetchFragment('footer/footer', lang);
 
-  if (resp) {
-    const html = resp;
-
+  if (footerFragment) {
     // decorate footer DOM
     const footer = document.createElement('div');
-    footer.innerHTML = html;
+    footer.innerHTML = footerFragment;
     decorateMenu(footer);
     await decorateSocial(footer);
     decorateBreadcrumb(footer);

@@ -1,3 +1,4 @@
+import { generateDetailedTeaserDOM } from '../detailed-teaser/detailed-teaser.js';
 import { generateTeaserDOM } from '../teaser/teaser.js';
 
 // callback for touch based scrolling event
@@ -32,33 +33,43 @@ export default function decorate(block) {
   // get all children elements
   const panels = [...block.children];
 
-  // loop through all teaser blocks
+  // loop through all children blocks
   [...panels].forEach((panel, i) => {
-    // generate the teaser panel
-    const { teaserDOM, classes } = generateTeaserDOM(panel.children, true);
+    // generate the  panel
+    const [image, classList, ...rest] = panel.children;
+    const classesText = classList.textContent.trim();
+    const classes = (classesText ? classesText.split(',') : []).map((c) => c && c.trim()).filter((c) => !!c);
+    const blockType = [...classes].includes('detailed-teaser') ? 'detailed-teaser' : 'teaser';
+    // check if we have to render teaser or a detailed teaser
+    const teaserDOM =
+      blockType === 'detailed-teaser'
+        ? generateDetailedTeaserDOM([image, ...rest], classes)
+        : generateTeaserDOM([image, ...rest], classes);
     panel.textContent = '';
-    panel.classList.add('teaser', 'block');
-    classes.split(' ').map((c) => panel.classList.add(c));
+    panel.classList.add(blockType, 'block');
+    classes.forEach((c) => panel.classList.add(c.trim()));
     panel.dataset.panel = `panel_${i}`;
     panel.append(teaserDOM);
     panelContainer.append(panel);
 
-    // generate the button
-    const button = document.createElement('button');
-    buttonContainer.append(button);
-    button.title = `Slide ${i + 1}`;
-    button.dataset.panel = `panel_${i}`;
-    if (!i) button.classList.add('selected');
+    if (panels.length > 1) {
+      // generate the button
+      const button = document.createElement('button');
+      buttonContainer.append(button);
+      button.title = `Slide ${i + 1}`;
+      button.dataset.panel = `panel_${i}`;
+      if (!i) button.classList.add('selected');
 
-    observer.observe(panel);
+      observer.observe(panel);
 
-    // add event listener to button
-    button.addEventListener('click', () => {
-      panelContainer.scrollTo({ top: 0, left: panel.offsetLeft - panel.parentNode.offsetLeft, behavior: 'smooth' });
-    });
+      // add event listener to button
+      button.addEventListener('click', () => {
+        panelContainer.scrollTo({ top: 0, left: panel.offsetLeft - panel.parentNode.offsetLeft, behavior: 'smooth' });
+      });
+    }
   });
 
   block.textContent = '';
   block.append(panelContainer);
-  block.append(buttonContainer);
+  if (buttonContainer.children.length) block.append(buttonContainer);
 }

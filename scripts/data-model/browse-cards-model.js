@@ -1,14 +1,14 @@
 const browseCardDataModel = {
+  id: '',
   contentType: '',
   badgeTitle: '',
   thumbnail: '',
-  product: '',
+  product: [],
   title: '',
   description: '',
-  tags: '',
+  tags: [],
   event: {
-    startTime: '',
-    endTime: '',
+    time: '',
   },
   contributor: {
     thumbnail: '',
@@ -20,6 +20,8 @@ const browseCardDataModel = {
   bookmarkLink: '',
   viewLink: '',
   viewLinkText: '',
+  inProgressText: '',
+  inProgressStatus: '',
 };
 
 export default browseCardDataModel;

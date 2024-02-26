@@ -1,20 +1,20 @@
-import { fetchPlaceholders } from '../lib-franklin.js';
 import browseCardDataModel from '../data-model/browse-cards-model.js';
-import CONTENT_TYPES from './browse-cards-constants.js';
+import { CONTENT_TYPES } from './browse-cards-constants.js';
+import { rewriteDocsPath, fetchLanguagePlaceholders } from '../scripts.js';
 
 /**
  * Module that provides functionality for adapting Coveo search results to BrowseCards data model.
  * @module BrowseCardsCoveoDataAdaptor
  */
 const BrowseCardsCoveoDataAdaptor = (() => {
-  let placeholders;
+  let placeholders = {};
 
   /**
    * Converts a string to title case.
    * @param {string} str - The input string.
    * @returns {string} The string in title case.
    */
-  const convertToTitleCase = (str) => str.replace(/\b\w/g, (match) => match.toUpperCase());
+  const convertToTitleCase = (str) => (str ? str.replace(/\b\w/g, (match) => match.toUpperCase()) : '');
 
   /**
    * Creates tags based on the result and content type.
@@ -24,13 +24,20 @@ const BrowseCardsCoveoDataAdaptor = (() => {
    */
   const createTags = (result, contentType) => {
     const tags = [];
-
+    const role = result?.raw?.role ? result.raw.role.replace(/,/g, ', ') : '';
     if (contentType === CONTENT_TYPES.COURSE.MAPPING_KEY) {
-      tags.push({ icon: 'user', text: '' });
-      tags.push({ icon: 'book', text: `0 ${placeholders.lesson}` });
+      tags.push({ icon: 'user', text: role || '' });
+      /* TODO: Will enable once we have the API changes ready from ExL */
+      // tags.push({ icon: 'book', text: `0 ${placeholders.lesson}` });
     } else {
-      tags.push({ icon: result?.raw?.el_view_status ? 'view' : '', text: result?.raw?.el_view_status || '' });
-      tags.push({ icon: result?.raw?.el_reply_status ? 'reply' : '', text: result?.raw?.el_reply_status || '' });
+      tags.push({
+        icon: result?.parentResult?.raw?.el_view_status || result?.raw?.el_view_status ? 'view' : '',
+        text: result?.parentResult?.raw?.el_view_status || result?.raw?.el_view_status || '',
+      });
+      tags.push({
+        icon: result?.parentResult?.raw?.el_reply_status || result?.raw?.el_reply_status ? 'reply' : '',
+        text: result?.parentResult?.raw?.el_reply_status || result?.raw?.el_reply_status || '',
+      });
     }
     return tags;
   };
@@ -38,29 +45,48 @@ const BrowseCardsCoveoDataAdaptor = (() => {
   /**
    * Maps a result to the BrowseCards data model.
    * @param {Object} result - The result object.
+   * @param {Object} param - The param object.
    * @returns {Object} The BrowseCards data model.
    */
   const mapResultToCardsDataModel = (result) => {
-    const { raw, title, excerpt, uri } = result || {};
-    /* eslint-disable-next-line camelcase */
-    const { contenttype, el_product } = raw || {};
+    const { raw, parentResult, title, excerpt, clickUri, uri } = result || {};
+    /* eslint-disable camelcase */
 
-    const contentType = Array.isArray(contenttype) ? contenttype[0]?.toLowerCase() : contenttype?.toLowerCase();
-    /* eslint-disable-next-line camelcase */
-    const product = Array.isArray(el_product) ? el_product[0] : el_product;
-    const tags = createTags(result, contentType, placeholders);
+    const { el_id, el_contenttype, el_product, el_solution, el_type } = parentResult?.raw || raw || {};
+    let contentType;
+    if (el_type) {
+      contentType = el_type.trim();
+    } else {
+      contentType = Array.isArray(el_contenttype) ? el_contenttype[0]?.trim() : el_contenttype?.trim();
+    }
+    let product = el_product && (Array.isArray(el_product) ? el_product : el_product.split(/,\s*/));
+    if (!product && el_solution) {
+      product = el_solution && (Array.isArray(el_solution) ? el_solution : el_solution.split(/,\s*/));
+    }
+    const tags = createTags(result, contentType.toLowerCase());
+    let url = parentResult?.clickUri || parentResult?.uri || clickUri || uri || '';
+    if (contentType.toLowerCase() !== CONTENT_TYPES.COURSE.MAPPING_KEY) {
+      url = rewriteDocsPath(url, true);
+    }
 
     return {
       ...browseCardDataModel,
+      id: parentResult?.el_id || el_id || '',
       contentType,
       badgeTitle: CONTENT_TYPES[contentType.toUpperCase()]?.LABEL,
+      thumbnail:
+        (raw?.video_url &&
+          (raw.video_url.includes('?')
+            ? raw.video_url.replace(/\?.*/, '?format=jpeg')
+            : `${raw.video_url}?format=jpeg`)) ||
+        '',
       product,
-      title: title || '',
-      description: excerpt || '',
+      title: parentResult?.title || title || '',
+      description: parentResult?.excerpt || excerpt || '',
       tags,
-      copyLink: uri || '',
-      viewLink: uri || '',
-      viewLinkText: contentType ? placeholders[`viewLink${convertToTitleCase(contentType)}`] : '',
+      copyLink: url,
+      viewLink: url,
+      viewLinkText: placeholders[`viewLink${convertToTitleCase(contentType)}`] || 'View',
     };
   };
 
@@ -70,7 +96,12 @@ const BrowseCardsCoveoDataAdaptor = (() => {
    * @returns {Promise<Array>} A promise that resolves with an array of BrowseCards data models.
    */
   const mapResultsToCardsData = async (data) => {
-    placeholders = await fetchPlaceholders();
+    try {
+      placeholders = await fetchLanguagePlaceholders();
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('Error fetching placeholders:', err);
+    }
     return data.map((result) => mapResultToCardsDataModel(result));
   };
 

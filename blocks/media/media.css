@@ -11,6 +11,7 @@
   display:flex;
   flex-flow: column nowrap;
   justify-content: center;
+  background-color: var(--background-color);
 }
 
 /* the image */
@@ -53,6 +54,12 @@
   line-height: 30px;
   margin-bottom: var(--space-token-xxs);
   color: var(--spectrum-gray-800);
+}
+
+.media.block > .text > .title :where(h1,h2,h3,h4,h5,h6) {
+  margin: 0;
+  color: inherit;
+  font: inherit;
 }
 
 .media.block > .text > .description,
@@ -101,7 +108,7 @@
   .media.block {
     flex-flow: row nowrap;
     align-items: center;
-    gap: var(--spectrum-spacing-500);
+    gap: var(--space-token-xxl);
   }
 
   /* the image */
@@ -135,10 +142,12 @@
 }
 
 /* when enough width set fixed image size */
-@media (min-width: 800px) {
+@media (min-width: 900px) {
   .media.block > .image img {
-    width: 400px;
-    height: 300px;
+    width: 500px;
+    height: 375px;
+    max-width: none;
+    max-height: none;
   }
 }
 

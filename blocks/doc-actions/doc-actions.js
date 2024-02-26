@@ -1,160 +1,210 @@
-import { isDocPage } from '../../scripts/scripts.js';
+import { loadCSS, loadBlocks, decorateIcons } from '../../scripts/lib-franklin.js';
+import { createTag, fetchLanguagePlaceholders, isDocPage, htmlToElement, decorateMain } from '../../scripts/scripts.js';
 import loadJWT from '../../scripts/auth/jwt.js';
-import { adobeIMS, profile, updateProfile } from '../../scripts/data-service/profile.js';
+import { automaticTranslationLink } from '../../scripts/urls.js';
+import { adobeIMS, profile } from '../../scripts/data-service/profile-service.js';
+import { tooltipTemplate } from '../../scripts/toast/toast.js';
+import renderBookmark from '../../scripts/bookmark/bookmark.js';
+import attachCopyLink from '../../scripts/copy-link/copy-link.js';
+import { assetInteractionModel } from '../../scripts/analytics/lib-analytics.js';
 
-const CONFIG = {
-  BOOKMARK_SET: 'Success! This is bookmarked to your profile.',
-  BOOKMARK_UNSET: 'Success! This is no longer bookmarked to your profile.',
-  BOOKMARK_UNAUTH_LABEL: 'Sign-in to bookmark',
-  BOOKMARK_UNAUTH_TIPTEXT: 'Bookmark',
-  BOOKMARK_AUTH_LABEL_SET: 'Bookmark page',
-  BOOKMARK_AUTH_LABEL_REMOVE: 'Remove Bookmark',
-  BOOKMARK_AUTH_TIPTEXT: 'Bookmark',
-  NOTICE_LABEL: 'Copy link',
-  NOTICE_TIPTEXT: 'Copy link URL',
-  NOTICE_SET: 'URL copied',
-};
+loadCSS(`${window.hlx.codeBasePath}/scripts/toast/toast.css`);
 
-const tooltipTemplate = (sel, label, tiptext) => {
-  const tooltipContent = `<div class="exl-tooltip">
-        <span class="icon ${sel}"></span>
-        <span class="exl-tooltip-label">${tiptext}</span></div>
-        <span class="exl-link-label">${label}</span>`;
-  return tooltipContent;
-};
-
-const noticeTemplate = (info) => {
-  const noticeContent = document.createElement('div');
-  noticeContent.className = 'exl-toast';
-  noticeContent.innerHTML = `<div class="icon-info"></div>
-        <div class="exl-toast-content">${info}</div>
-        <div class="icon-close"></div>`;
-  return noticeContent;
-};
-
-const sendNotice = (noticelabel) => {
-  const sendNoticeContent = noticeTemplate(noticelabel);
-  document.body.prepend(sendNoticeContent);
-  const isExlNotice = document.querySelector('.exl-toast');
-  if (isExlNotice) {
-    document.querySelector('.exl-toast .icon-close').addEventListener('click', () => {
-      isExlNotice.remove();
-    });
-
-    setTimeout(() => {
-      isExlNotice.remove();
-    }, 3000);
-  }
-};
+let translatedDocElement = null;
+let placeholders = {};
+try {
+  placeholders = await fetchLanguagePlaceholders();
+} catch (err) {
+  // eslint-disable-next-line no-console
+  console.error('Error fetching placeholders:', err);
+}
 
 function decorateBookmarkMobileBlock() {
-  const docActionsMobile = document.createElement('div');
-  docActionsMobile.classList.add('doc-actions-mobile');
+  if (!document.querySelector('.doc-actions-mobile')) {
+    const docActionsMobile = document.createElement('div');
+    docActionsMobile.classList.add('doc-actions-mobile');
 
-  const createdByEl = document.querySelector('.article-metadata-createdby-wrapper');
-  const articleMetaDataEl = document.querySelector('.article-metadata-wrapper');
-  if (articleMetaDataEl.nextSibling === createdByEl) {
-    createdByEl.appendChild(docActionsMobile);
-  } else if (articleMetaDataEl) {
-    articleMetaDataEl.appendChild(docActionsMobile);
+    const createdByEl = document.querySelector('.article-metadata-createdby-wrapper');
+    const articleMetaDataEl = document.querySelector('.article-metadata-wrapper');
+    if (articleMetaDataEl.nextSibling === createdByEl) {
+      createdByEl.appendChild(docActionsMobile);
+    } else if (articleMetaDataEl) {
+      articleMetaDataEl.appendChild(docActionsMobile);
+    }
   }
 }
 
 const isSignedIn = adobeIMS?.isSignedInUser();
 
 export function decorateBookmark(block) {
-  const id = ((document.querySelector('meta[name="id"]') || {}).content || '').trim();
+  const bookmarkId = ((document.querySelector('meta[name="id"]') || {}).content || '').trim();
   const unAuthBookmark = document.createElement('div');
   unAuthBookmark.className = 'bookmark';
   unAuthBookmark.innerHTML = tooltipTemplate(
     'bookmark-icon',
-    CONFIG.BOOKMARK_UNAUTH_TIPTEXT,
-    CONFIG.BOOKMARK_UNAUTH_LABEL,
+    `${placeholders.bookmarkUnauthTiptext}`,
+    `${placeholders.bookmarkUnauthLabel}`,
   );
 
   const authBookmark = document.createElement('div');
   authBookmark.className = 'bookmark auth';
   authBookmark.innerHTML = tooltipTemplate(
     'bookmark-icon',
-    CONFIG.BOOKMARK_AUTH_TIPTEXT,
-    CONFIG.BOOKMARK_AUTH_LABEL_SET,
+    `${placeholders.bookmarkAuthTiptext}`,
+    `${placeholders.bookmarkAuthLabelSet}`,
   );
+
+  const docActionsMobileBookmark = document.querySelector('.doc-actions-mobile .bookmark');
+  const docActionsMobileContainer = document.querySelector('.doc-actions-mobile');
 
   if (isSignedIn) {
     block.appendChild(authBookmark);
-    if (document.querySelector('.doc-actions-mobile')) {
-      document.querySelector('.doc-actions-mobile').appendChild(authBookmark.cloneNode(true));
+    if (docActionsMobileContainer && !docActionsMobileBookmark) {
+      docActionsMobileContainer.appendChild(authBookmark.cloneNode(true));
     }
-    const bookmarkAuthed = document.querySelectorAll('.bookmark.auth');
-    if (bookmarkAuthed.length > 0) {
-      bookmarkAuthed.forEach((elem) => {
-        const bookmarkAuthedToolTipLabel = elem.querySelector('.exl-tooltip-label');
-        const bookmarkAuthedToolTipIcon = elem.querySelector('.icon.bookmark-icon');
-        if (id.length === 0) {
-          console.log('Hooking bookmark failed. No id present.');
-        } else {
-          loadJWT().then(async () => {
-            profile().then(async (data) => {
-              if (data.bookmarks.includes(id)) {
-                bookmarkAuthedToolTipIcon.classList.add('authed');
-                bookmarkAuthedToolTipLabel.innerHTML = CONFIG.BOOKMARK_AUTH_LABEL_REMOVE;
-              }
-            });
-
-            bookmarkAuthedToolTipIcon.addEventListener('click', async () => {
-              if (bookmarkAuthedToolTipIcon.classList.contains('authed')) {
-                await updateProfile('bookmarks', id);
-                bookmarkAuthedToolTipLabel.innerHTML = CONFIG.BOOKMARK_AUTH_LABEL_SET;
-                bookmarkAuthedToolTipIcon.classList.remove('authed');
-                sendNotice(CONFIG.BOOKMARK_UNSET);
-                bookmarkAuthedToolTipIcon.style.pointerEvents = 'none';
-              } else {
-                await updateProfile('bookmarks', id);
-                bookmarkAuthedToolTipLabel.innerHTML = CONFIG.BOOKMARK_AUTH_LABEL_REMOVE;
-                bookmarkAuthedToolTipIcon.classList.add('authed');
-                sendNotice(CONFIG.BOOKMARK_SET);
-                bookmarkAuthedToolTipIcon.style.pointerEvents = 'none';
-              }
-              setTimeout(() => {
-                bookmarkAuthedToolTipIcon.style.pointerEvents = 'auto';
-              }, 3000);
-            });
-          });
+    const bookmarkAuthedDesktop = document.querySelector('.doc-actions .bookmark.auth');
+    const bookmarkAuthedMobile = document.querySelector('.doc-actions-mobile .bookmark.auth');
+    const bookmarkAuthedToolTipLabelD = bookmarkAuthedDesktop.querySelector('.exl-tooltip-label');
+    const bookmarkAuthedToolTipIconD = bookmarkAuthedDesktop.querySelector('.bookmark-icon');
+    const bookmarkAuthedToolTipLabelM = bookmarkAuthedMobile.querySelector('.exl-tooltip-label');
+    const bookmarkAuthedToolTipIconM = bookmarkAuthedMobile.querySelector('.bookmark-icon');
+    loadJWT().then(async () => {
+      profile().then(async (data) => {
+        if (data.bookmarks.includes(bookmarkId)) {
+          bookmarkAuthedToolTipIconD.classList.add('authed');
+          bookmarkAuthedToolTipLabelD.innerHTML = `${placeholders.bookmarkAuthLabelRemove}`;
+          bookmarkAuthedToolTipIconM.classList.add('authed');
+          bookmarkAuthedToolTipLabelM.innerHTML = `${placeholders.bookmarkAuthLabelRemove}`;
         }
       });
-    }
+
+      renderBookmark(bookmarkAuthedToolTipLabelD, bookmarkAuthedToolTipIconD, bookmarkId);
+      renderBookmark(bookmarkAuthedToolTipLabelM, bookmarkAuthedToolTipIconM, bookmarkId);
+    });
   } else {
     block.appendChild(unAuthBookmark);
-    if (document.querySelector('.doc-actions-mobile')) {
-      document.querySelector('.doc-actions-mobile').appendChild(unAuthBookmark.cloneNode(true));
+    if (docActionsMobileContainer && !docActionsMobileBookmark) {
+      docActionsMobileContainer.appendChild(unAuthBookmark.cloneNode(true));
     }
   }
 }
 
-export function decorateCopyLink(block) {
+function decorateCopyLink(block) {
   const copyLinkDivNode = document.createElement('div');
   copyLinkDivNode.className = 'copy-link';
-  copyLinkDivNode.innerHTML = tooltipTemplate('copy-link-url', CONFIG.NOTICE_LABEL, CONFIG.NOTICE_TIPTEXT);
+  copyLinkDivNode.innerHTML = tooltipTemplate(
+    'copy-icon',
+    `${placeholders.toastLabel}`,
+    `${placeholders.toastTiptext}`,
+  );
 
   block.appendChild(copyLinkDivNode);
-  if (document.querySelector('.doc-actions-mobile')) {
-    document.querySelector('.doc-actions-mobile').appendChild(copyLinkDivNode.cloneNode(true));
+  const docActionsDesktopIconCopy = document.querySelector('.doc-actions .copy-icon');
+  const docActionsMobile = document.querySelector('.doc-actions-mobile');
+
+  if (docActionsDesktopIconCopy) {
+    attachCopyLink(docActionsDesktopIconCopy, window.location.href, placeholders.toastSet);
   }
-  const copyLinkIcons = document.querySelectorAll('.icon.copy-link-url');
-  copyLinkIcons.forEach((copyLinkIcon) => {
-    if (copyLinkIcon) {
-      copyLinkIcon.addEventListener('click', (e) => {
-        e.preventDefault();
-        navigator.clipboard.writeText(window.location.href);
-        sendNotice(CONFIG.NOTICE_SET);
-      });
+
+  if (docActionsMobile && !docActionsMobile.querySelector('.copy-icon')) {
+    docActionsMobile.appendChild(copyLinkDivNode.cloneNode(true));
+    const docActionsMobileIconCopy = docActionsMobile.querySelector('.copy-icon');
+    attachCopyLink(docActionsMobileIconCopy, window.location.href, placeholders.toastSet);
+  }
+}
+
+async function getTranslatedDocContent() {
+  const docPath = `/en/${window.location.pathname.replace(/^(?:[^/]*\/){2}\s*/, '')}`;
+  const docResponse = await fetch(`${docPath}.plain.html`);
+  const translatedDoc = await docResponse.text();
+  const docElement = htmlToElement(`<div>${translatedDoc}</div>`);
+  decorateMain(docElement);
+  await loadBlocks(docElement);
+  return docElement.querySelector(':scope > div:first-child');
+}
+
+async function toggleContent(isChecked, docContainer) {
+  if (isChecked && !translatedDocElement) {
+    translatedDocElement = await getTranslatedDocContent();
+  }
+  if (isChecked) {
+    const docActionsMobile = docContainer.querySelector('.doc-actions-mobile');
+    if (docActionsMobile) {
+      const createdByEl = translatedDocElement.querySelector('.article-metadata-createdby-wrapper');
+      const articleMetaDataEl = translatedDocElement.querySelector('.article-metadata-wrapper');
+      if (articleMetaDataEl.nextSibling === createdByEl) {
+        createdByEl.appendChild(docActionsMobile);
+      } else if (articleMetaDataEl) {
+        articleMetaDataEl.appendChild(docActionsMobile);
+      }
     }
-  });
+    docContainer.replaceWith(translatedDocElement);
+  } else {
+    const dc = document.querySelector('main > div:first-child');
+    const docActionsMobile = translatedDocElement.querySelector('.doc-actions-mobile');
+    if (docActionsMobile) {
+      const createdByEl = docContainer.querySelector('.article-metadata-createdby-wrapper');
+      const articleMetaDataEl = docContainer.querySelector('.article-metadata-wrapper');
+      if (articleMetaDataEl.nextSibling === createdByEl) {
+        createdByEl.appendChild(docActionsMobile);
+      } else if (articleMetaDataEl) {
+        articleMetaDataEl.appendChild(docActionsMobile);
+      }
+    }
+    dc.replaceWith(docContainer);
+  }
+}
+
+async function decorateLanguageToggle(block) {
+  if (
+    document.querySelector('meta[name="ht-degree"]') &&
+    ((document.querySelector('meta[name="ht-degree"]') || {}).content || '').trim() !== '100%'
+  ) {
+    const languageToggleElement = createTag(
+      'div',
+      { class: 'doc-mt-toggle' },
+      `<div class="doc-mt-checkbox">
+      <span>${placeholders.automaticTranslation}</span>
+      <input type="checkbox"><a href="${automaticTranslationLink}" target="_blank"><span class="icon icon-info"></span></a>
+      </div>
+      <div class="doc-mt-feedback">
+        <span class="prompt">${placeholders.automaticTranslationFeedback}</span>
+        <div class="doc-mt-feedback-radio">
+          <label class="radio"><input type="radio" name="helpful-translation" value="yes">${placeholders.automaticTranslationFeedbackYes}</label>
+          <label class="radio"><input type="radio" name="helpful-translation" value="no">${placeholders.automaticTranslationFeedbackNo}</label>
+        </div>
+      </div>`,
+    );
+    // addToDocActions(languageToggleElement, block);
+    block.appendChild(languageToggleElement);
+    await decorateIcons(block);
+    const desktopAndMobileLangToggles = document.querySelectorAll(
+      '.doc-mt-toggle .doc-mt-checkbox input[type="checkbox"]',
+    );
+    const docContainer = document.querySelector('main > div:first-child');
+
+    [...desktopAndMobileLangToggles].forEach((langToggle) => {
+      langToggle.addEventListener('change', async (e) => {
+        const { checked } = e.target;
+        await toggleContent(checked, docContainer);
+      });
+    });
+
+    const desktopAndMobileRadioFeedback = document.querySelectorAll(
+      '.doc-mt-toggle .doc-mt-feedback input[type="radio"]',
+    );
+    [...desktopAndMobileRadioFeedback].forEach((radio) => {
+      radio.addEventListener('click', async () => {
+        assetInteractionModel(null, 'Radio Select');
+      });
+    });
+  }
 }
 
 export default async function decorateDocActions(block) {
   if (isDocPage) {
     decorateBookmarkMobileBlock();
+    decorateLanguageToggle(block);
     decorateBookmark(block);
     decorateCopyLink(block);
   }

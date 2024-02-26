@@ -109,12 +109,13 @@ export function sampleRUM(checkpoint, data = {}) {
  * Loads a CSS file.
  * @param {string} href URL to the CSS file
  */
-export async function loadCSS(href) {
+export async function loadCSS(href, media) {
   return new Promise((resolve, reject) => {
     if (!document.querySelector(`head > link[href="${href}"]`)) {
       const link = document.createElement('link');
       link.rel = 'stylesheet';
       link.href = href;
+      if (media) link.media = media;
       link.onload = resolve;
       link.onerror = reject;
       document.head.append(link);
@@ -370,7 +371,7 @@ export function readBlockConfig(block) {
  * @param {Element} main The container element
  */
 export function decorateSections(main) {
-  main.querySelectorAll(':scope > div').forEach((section) => {
+  main.querySelectorAll(':scope > div:not([data-section-status])').forEach((section) => {
     const wrappers = [];
     let defaultContent = false;
     [...section.children].forEach((e) => {
@@ -422,16 +423,7 @@ export function updateSectionsStatus(main) {
         break;
       } else {
         section.dataset.sectionStatus = 'loaded';
-        /**
-         * FIXME: All sections are loaded with first section
-         * to improve performance. Revisit this section and identify a proper
-         * fix.
-         * */
-        if (i === 0) {
-          sections.forEach((sec) => {
-            sec.style.display = null;
-          });
-        }
+        section.style.display = null;
       }
     }
   }
@@ -722,6 +714,7 @@ export function setup() {
   window.hlx = window.hlx || {};
   window.hlx.RUM_MASK_URL = 'full';
   window.hlx.codeBasePath = '';
+  window.hlx.aemRoot = '';
   window.hlx.lighthouse = new URLSearchParams(window.location.search).get('lighthouse') === 'on';
   window.hlx.patchBlockConfig = [];
 

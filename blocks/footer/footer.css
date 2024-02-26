@@ -4,8 +4,14 @@
   background-color: var(--footer-background-color);
   padding: 25px 0 20px;
 }
+@media (min-width: 900px) {
+  .footer-wrapper {
+    min-height: 527px;
+  }
+}
 
 .footer {
+  --language-selector-display: block;
   margin: 0 auto;
   max-width: var(--non-spectrum-max-width);
   padding: 0;
@@ -126,6 +132,9 @@
 }
 .footer-item-active ul {
   display: block;
+}
+.footer .language-selector-button {
+  padding: 0;
 }
 .footer-lang-social {
   display: flex;

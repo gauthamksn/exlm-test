@@ -13,10 +13,252 @@
       {
         "component": "text-input",
         "valueType": "string",
-        "name": "imageAlt",
+        "name": "fileReferenceAlt",
         "value": "",
         "label": "Image Description",
         "description": "A descriptive text of the image will be shown as tooltip."
+      },
+      {
+        "component": "multiselect",
+        "name": "classes",
+        "label": "Style",
+        "valueType": "string",
+        "required": true,
+        "maxSize": 3,
+        "options": [
+          {
+            "name": "Theme",
+            "children": [
+              {
+                "name": "Light",
+                "value": "light"
+              },
+              {
+                "name": "Dark",
+                "value": "dark"
+              }
+            ]
+          },
+          {
+            "name": "Alignment",
+            "children": [
+              {
+                "name": "Left",
+                "value": "left"
+              },
+              {
+                "name": "Right",
+                "value": "right"
+              }
+            ]
+          },
+          {
+            "name": "Background Color",
+            "children": [
+              {
+                "name": "Grey",
+                "value": "bg-spectrum-gray-700"
+              },
+              {
+                "name": "Blue",
+                "value": "bg-spectrum-blue-700"
+              },
+              {
+                "name": "Green",
+                "value": "bg-spectrum-green-700"
+              },
+              {
+                "name": "Orange",
+                "value": "bg-spectrum-orange-700"
+              },
+              {
+                "name": "Red",
+                "value": "bg-spectrum-red-700"
+              },
+              {
+                "name": "Celery",
+                "value": "bg-spectrum-celery-700"
+              },
+              {
+                "name": "Chartreuse",
+                "value": "bg-spectrum-chartreuse-700"
+              },
+              {
+                "name": "Cyan",
+                "value": "bg-spectrum-cyan-700"
+              },
+              {
+                "name": "Fuchsia",
+                "value": "bg-spectrum-fuchsia-700"
+              },
+              {
+                "name": "Indigo",
+                "value": "bg-spectrum-indigo-700"
+              },
+              {
+                "name": "Magenta",
+                "value": "bg-spectrum-magenta-700"
+              },
+              {
+                "name": "Purple",
+                "value": "bg-spectrum-purple-700"
+              },
+              {
+                "name": "Seafoam",
+                "value": "bg-spectrum-seafoam-700"
+              },
+              {
+                "name": "Yellow",
+                "value": "bg-spectrum-yellow-700"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "component": "text-input",
+        "valueType": "string",
+        "name": "eyebrow",
+        "value": "",
+        "label": "Eyebrow",
+        "description": "Sets the small pre-title above the title."
+      },
+      {
+        "component": "text-input",
+        "valueType": "string",
+        "name": "title",
+        "value": "",
+        "label": "Heading",
+        "description": "Sets the main title of the teaser."
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "titleType",
+        "value": "h3",
+        "label": "Heading Type",
+        "options": [
+          {
+            "name": "H1",
+            "value": "h1"
+          },
+          {
+            "name": "H2",
+            "value": "h2"
+          },
+          {
+            "name": "H3",
+            "value": "h3"
+          },
+          {
+            "name": "H4",
+            "value": "h4"
+          },
+          {
+            "name": "H5",
+            "value": "h5"
+          },
+          {
+            "name": "H6",
+            "value": "h6"
+          }
+        ]
+      },
+      {
+        "component": "text-area",
+        "valueType": "string",
+        "name": "longDescr",
+        "value": "",
+        "label": "Long Description",
+        "description": "The description shown in Desktop and Tablet view."
+      },
+      {
+        "component": "text-area",
+        "valueType": "string",
+        "name": "shortDescr",
+        "value": "",
+        "label": "Short Description",
+        "description": "The description shown in Mobile view. If not set long text is used."
+      },
+      {
+        "component": "select",
+        "name": "cta1Type",
+        "value": "primary",
+        "label": "First CTA Type",
+        "description": "'Primary' will render button filled, 'Secondary' with an outline.",
+        "valueType": "string",
+        "options": [
+          {
+            "name": "Primary",
+            "value": "primary"
+          },
+          {
+            "name": "Secondary",
+            "value": "secondary"
+          }
+        ]
+      },
+      {
+        "component": "text-input",
+        "valueType": "string",
+        "name": "cta1Text",
+        "value": "",
+        "label": "First CTA Text",
+        "description": "Text to be shown inside button."
+      },
+      {
+        "component": "text-input",
+        "valueType": "string",
+        "name": "cta1",
+        "value": "",
+        "label": "First CTA Link",
+        "description": "What link to open when clicking the button."
+      },
+      {
+        "component": "select",
+        "name": "cta2Type",
+        "value": "primary",
+        "label": "Second CTA Type",
+        "description": "'Primary' will render button filled, 'Secondary' with an outline.",
+        "valueType": "string",
+        "options": [
+          {
+            "name": "Primary",
+            "value": "primary"
+          },
+          {
+            "name": "Secondary",
+            "value": "secondary"
+          }
+        ]
+      },
+      {
+        "component": "text-input",
+        "valueType": "string",
+        "name": "cta2Text",
+        "value": "",
+        "label": "Second CTA Text",
+        "description": "Text to be shown inside button."
+      },
+      {
+        "component": "text-input",
+        "valueType": "string",
+        "name": "cta2",
+        "value": "",
+        "label": "Second CTA Link",
+        "description": "What link to open when clicking the button."
+      }
+    ]
+  },
+  {
+    "id": "detailed-teaser",
+    "fields": [
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "fileReference",
+        "label": "Background Image",
+        "multi": false
       },
       {
         "component": "multiselect",
@@ -55,12 +297,36 @@
         ]
       },
       {
+        "component": "reference",
+        "valueType": "string",
+        "name": "eyebrow_logo",
+        "label": "Logo Image",
+        "description": "Optional Logo above eyebrow.",
+        "multi": false
+      },
+      {
         "component": "text-input",
         "valueType": "string",
-        "name": "eyebrow",
+        "name": "eyebrow_logoAlt",
         "value": "",
-        "label": "Eyebrow",
-        "description": "Sets the small pre-title above the title."
+        "label": "Logo Image alt text",
+        "description": "A descriptive text of the logo image."
+      },
+      {
+        "component": "text-input",
+        "valueType": "string",
+        "name": "eyebrow_title",
+        "value": "",
+        "label": "Eyebrow Main Title",
+        "description": "Sets the small Eyebrow above the title."
+      },
+      {
+        "component": "text-input",
+        "valueType": "string",
+        "name": "eyebrow_subtitle",
+        "value": "",
+        "label": "Eybrow Sub Title",
+        "description": "Second, smaller eyebrow line."
       },
       {
         "component": "text-input",
@@ -71,86 +337,60 @@
         "description": "Sets the main title of the teaser."
       },
       {
-        "component": "text-area",
-        "valueType": "string",
-        "name": "longDescr",
-        "value": "",
-        "label": "Long Description",
-        "description": "The description shown in Desktop and Tablet view."
-      },
-      {
-        "component": "text-area",
-        "valueType": "string",
-        "name": "shortDescr",
-        "value": "",
-        "label": "Short Description",
-        "description": "The description shown in Mobile view. If not set long text is used."
-      },
-      {
         "component": "select",
-        "name": "backgroundColor",
-        "value": "",
-        "label": "Background Color",
-        "description": "The teaser background color when in mobile view.",
         "valueType": "string",
+        "name": "titleType",
+        "value": "h3",
+        "label": "Heading Type",
         "options": [
           {
-            "name": "Grey",
-            "value": "--spectrum-gray-700"
+            "name": "H1",
+            "value": "h1"
           },
           {
-            "name": "Blue",
-            "value": "--spectrum-blue-700"
+            "name": "H2",
+            "value": "h2"
           },
           {
-            "name": "Green",
-            "value": "--spectrum-green-700"
+            "name": "H3",
+            "value": "h3"
           },
           {
-            "name": "Orange",
-            "value": "--spectrum-orange-700"
+            "name": "H4",
+            "value": "h4"
           },
           {
-            "name": "Red",
-            "value": "--spectrum-red-700"
+            "name": "H5",
+            "value": "h5"
           },
           {
-            "name": "Celery",
-            "value": "--spectrum-celery-700"
-          },
-          {
-            "name": "Chartreuse",
-            "value": "--spectrum-chartreuse-700"
-          },
-          {
-            "name": "Cyan",
-            "value": "--spectrum-cyan-700"
-          },
-          {
-            "name": "Fuchsia",
-            "value": "--spectrum-fuchsia-700"
-          },
-          {
-            "name": "Indigo",
-            "value": "--spectrum-indigo-700"
-          },
-          {
-            "name": "Magenta",
-            "value": "--spectrum-magenta-700"
-          },
-          {
-            "name": "Purple",
-            "value": "--spectrum-purple-700"
-          },
-          {
-            "name": "Seafoam",
-            "value": "--spectrum-seafoam-700"
-          },
-          {
-            "name": "Yellow",
-            "value": "--spectrum-yellow-700"
+            "name": "H6",
+            "value": "h6"
           }
         ]
+      },
+      {
+        "component": "text-area",
+        "valueType": "string",
+        "name": "description",
+        "value": "",
+        "label": "Teaser Text"
+      },
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "subject",
+        "label": "Subject Image",
+        "description": "Optional Subject Image.",
+        "multi": false
+      },
+      {
+        "component": "text-input",
+        "valueType": "string",
+        "name": "subjectAlt",
+        "value": "",
+        "label": "Subject Alt Text",
+        "description": "A descriptive text of the subject image."
       },
       {
         "component": "select",
@@ -181,7 +421,7 @@
       {
         "component": "text-input",
         "valueType": "string",
-        "name": "cta1Url",
+        "name": "cta1",
         "value": "",
         "label": "First CTA Link",
         "description": "What link to open when clicking the button."
@@ -196,7 +436,7 @@
         "options": [
           {
             "name": "Primary",
-            "value": ""
+            "value": "primary"
           },
           {
             "name": "Secondary",
@@ -215,7 +455,7 @@
       {
         "component": "text-input",
         "valueType": "string",
-        "name": "cta2Url",
+        "name": "cta2",
         "value": "",
         "label": "Second CTA Link",
         "description": "What link to open when clicking the button."
@@ -264,13 +504,6 @@
             "value": "h6"
           }
         ]
-      },
-      {
-        "component": "text-input",
-        "valueType": "string",
-        "name": "href",
-        "value": "",
-        "label": "Link"
       }
     ]
   },
@@ -318,15 +551,15 @@
         "valueType": "string",
         "options": [
           {
-            "name": "default",
+            "name": "Hyperlink",
             "value": ""
           },
           {
-            "name": "primary",
+            "name": "Primary",
             "value": "primary"
           },
           {
-            "name": "secondary",
+            "name": "Secondary",
             "value": "secondary"
           }
         ]
@@ -370,10 +603,50 @@
       {
         "component": "text-input",
         "valueType": "string",
+        "name": "cardIconAlt",
+        "label": "Icon Description",
+        "description": "Sets the Card icon's alternative text"
+      },
+      {
+        "component": "text-input",
+        "valueType": "string",
         "name": "cardHeading",
         "value": "",
         "label": "Heading",
         "description": "Sets the heading for Card."
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "cardHeadingType",
+        "value": "h3",
+        "label": "Heading Type",
+        "options": [
+          {
+            "name": "H1",
+            "value": "h1"
+          },
+          {
+            "name": "H2",
+            "value": "h2"
+          },
+          {
+            "name": "H3",
+            "value": "h3"
+          },
+          {
+            "name": "H4",
+            "value": "h4"
+          },
+          {
+            "name": "H5",
+            "value": "h5"
+          },
+          {
+            "name": "H6",
+            "value": "h6"
+          }
+        ]
       },
       {
         "component": "text-area",
@@ -432,6 +705,39 @@
         "description": "Sets the heading."
       },
       {
+        "component": "select",
+        "valueType": "string",
+        "name": "headingType",
+        "value": "h3",
+        "label": "Heading Type",
+        "options": [
+          {
+            "name": "H1",
+            "value": "h1"
+          },
+          {
+            "name": "H2",
+            "value": "h2"
+          },
+          {
+            "name": "H3",
+            "value": "h3"
+          },
+          {
+            "name": "H4",
+            "value": "h4"
+          },
+          {
+            "name": "H5",
+            "value": "h5"
+          },
+          {
+            "name": "H6",
+            "value": "h6"
+          }
+        ]
+      },
+      {
         "component": "text-input",
         "valueType": "string",
         "name": "tooltip",
@@ -456,12 +762,116 @@
         "description": "Sets the text url."
       },
       {
-        "component": "text-input",
+        "component": "multiselect",
         "valueType": "string",
-        "name": "contentType",
-        "value": "",
-        "label": "Content type",
-        "description": "Sets the content type."
+        "name": "contentTypes",
+        "label": "Filter by Content Type",
+        "description": "Select the content type(s).",
+        "options": [
+          {
+            "name": "Certification",
+            "value": "certification"
+          },
+          {
+            "name": "Communities",
+            "value": "community"
+          },
+          {
+            "name": "Courses",
+            "value": "course"
+          },
+          {
+            "name": "Documentation",
+            "value": "documentation"
+          },
+          {
+            "name": "On-Demand Event",
+            "value": "event"
+          },
+          {
+            "name": "Troubleshooting",
+            "value": "troubleshooting"
+          },
+          {
+            "name": "Tutorials",
+            "value": "tutorial"
+          }
+        ]
+      },
+      {
+        "component": "aem-tag",
+        "name": "cq:tags",
+        "label": "Solution(s) or Feature(s)",
+        "valueType": "string",
+        "rootPath": "/content/cq:tags/exl",
+        "description": "Optional - all are included if no selection is made."
+      },
+      {
+        "component": "multiselect",
+        "name": "roles",
+        "label": "Role(s)",
+        "valueType": "string",
+        "description": "Sets the Role(s).",
+        "options": [
+          {
+            "name": "Admin",
+            "value": "Admin"
+          },
+          {
+            "name": "Developer",
+            "value": "Developer"
+          },
+          {
+            "name": "Leader",
+            "value": "Leader"
+          },
+          {
+            "name": "User",
+            "value": "User"
+          }
+        ]
+      },
+      {
+        "component": "multiselect",
+        "name": "experienceLevels",
+        "label": "Experience Level(s)",
+        "valueType": "string",
+        "description": "Sets the Experience Level(s).",
+        "options": [
+          {
+            "name": "Beginner",
+            "value": "Beginner"
+          },
+          {
+            "name": "Intermediate",
+            "value": "Intermediate"
+          },
+          {
+            "name": "Advanced",
+            "value": "Advanced"
+          }
+        ]
+      },
+      {
+        "component": "radio-group",
+        "name": "sortBy",
+        "value": "RELEVANCE",
+        "label": "Sort by",
+        "valueType": "string",
+        "options": [
+          {
+            "name": "Relevance",
+            "value": "RELEVANCE"
+          },
+          {
+            "name": "Most recent",
+            "value": "MOST_RECENT"
+          },
+          {
+            "name": "Most popular",
+            "value": "MOST_POPULAR"
+          }
+        ]
       }
     ]
   },
@@ -483,14 +893,14 @@
       {
         "component": "text-input",
         "valueType": "string",
-        "name": "imageAlt",
+        "name": "fileReferenceAlt",
         "value": "",
         "label": "Subject Image Description",
         "description": "A descriptive text of the image will be shown as tooltip."
       },
       {
         "component": "select",
-        "name": "backgroundColor",
+        "name": "classes",
         "value": "",
         "label": "Background Color",
         "description": "The marquee background color",
@@ -498,59 +908,59 @@
         "options": [
           {
             "name": "Gray",
-            "value": "--spectrum-gray-700"
+            "value": "bg-spectrum-gray-700"
           },
           {
             "name": "Blue",
-            "value": "--spectrum-blue-700"
+            "value": "bg-spectrum-blue-700"
           },
           {
             "name": "Green",
-            "value": "--spectrum-green-700"
+            "value": "bg-spectrum-green-700"
           },
           {
             "name": "Orange",
-            "value": "--spectrum-orange-700"
+            "value": "bg-spectrum-orange-700"
           },
           {
             "name": "Red",
-            "value": "--spectrum-red-700"
+            "value": "bg-spectrum-red-700"
           },
           {
             "name": "Celery",
-            "value": "--spectrum-celery-700"
+            "value": "bg-spectrum-celery-700"
           },
           {
             "name": "Chartreuse",
-            "value": "--spectrum-chartreuse-700"
+            "value": "bg-spectrum-chartreuse-700"
           },
           {
             "name": "Cyan",
-            "value": "--spectrum-cyan-700"
+            "value": "bg-spectrum-cyan-700"
           },
           {
             "name": "Fuchsia",
-            "value": "--spectrum-fuchsia-700"
+            "value": "bg-spectrum-fuchsia-700"
           },
           {
             "name": "Indigo",
-            "value": "--spectrum-indigo-700"
+            "value": "bg-spectrum-indigo-700"
           },
           {
             "name": "Magenta",
-            "value": "--spectrum-magenta-700"
+            "value": "bg-spectrum-magenta-700"
           },
           {
             "name": "Purple",
-            "value": "--spectrum-purple-700"
+            "value": "bg-spectrum-purple-700"
           },
           {
             "name": "Seafoam",
-            "value": "--spectrum-seafoam-700"
+            "value": "bg-spectrum-seafoam-700"
           },
           {
             "name": "Yellow",
-            "value": "--spectrum-yellow-700"
+            "value": "bg-spectrum-yellow-700"
           }
         ]
       },
@@ -571,30 +981,45 @@
         "description": "Sets the main title of the marquee."
       },
       {
+        "component": "select",
+        "valueType": "string",
+        "name": "titleType",
+        "value": "h3",
+        "label": "Heading Type",
+        "options": [
+          {
+            "name": "H1",
+            "value": "h1"
+          },
+          {
+            "name": "H2",
+            "value": "h2"
+          },
+          {
+            "name": "H3",
+            "value": "h3"
+          },
+          {
+            "name": "H4",
+            "value": "h4"
+          },
+          {
+            "name": "H5",
+            "value": "h5"
+          },
+          {
+            "name": "H6",
+            "value": "h6"
+          }
+        ]
+      },
+      {
         "component": "text-area",
         "valueType": "string",
         "name": "longDescr",
         "value": "",
         "label": "Long Description",
         "description": "The description shown in Desktop and Tablet view."
-      },
-      {
-        "component": "select",
-        "name": "cta1Type",
-        "value": "primary",
-        "label": "First CTA Type",
-        "description": "'Primary' will render button filled, 'Secondary' with an outline.",
-        "valueType": "string",
-        "options": [
-          {
-            "name": "Primary",
-            "value": "primary"
-          },
-          {
-            "name": "Secondary",
-            "value": "secondary"
-          }
-        ]
       },
       {
         "component": "text-input",
@@ -607,28 +1032,170 @@
       {
         "component": "text-input",
         "valueType": "string",
-        "name": "cta1Url",
+        "name": "cta1",
         "value": "",
         "label": "First CTA Link",
         "description": "What link to open when clicking the button."
       },
       {
+        "component": "text-input",
+        "valueType": "string",
+        "name": "cta2Text",
+        "value": "",
+        "label": "Sign up CTA Text",
+        "description": "Text to be shown inside button."
+      }
+    ]
+  },
+  {
+    "id": "sign-up",
+    "fields": [
+      {
+        "component": "reference",
+        "valueType": "string",
+        "name": "fileReference",
+        "label": "Subject Image",
+        "description": "The sign-up subject image, min Xpx x Ypx...",
+        "multi": false
+      },
+      {
+        "component": "text-input",
+        "valueType": "string",
+        "name": "fileReferenceAlt",
+        "value": "",
+        "label": "Subject Image Description",
+        "description": "A descriptive text of the image will be shown as tooltip."
+      },
+      {
         "component": "select",
-        "name": "cta2Type",
-        "value": "primary",
-        "label": "Second CTA Type",
-        "description": "'Primary' will render button filled, 'Secondary' with an outline.",
+        "name": "classes",
+        "value": "",
+        "label": "Background Color",
+        "description": "The sign-up background color",
         "valueType": "string",
         "options": [
           {
-            "name": "Primary",
-            "value": ""
+            "name": "Gray",
+            "value": "bg-spectrum-gray-700"
           },
           {
-            "name": "Secondary",
-            "value": "secondary"
+            "name": "Blue",
+            "value": "bg-spectrum-blue-700"
+          },
+          {
+            "name": "Green",
+            "value": "bg-spectrum-green-700"
+          },
+          {
+            "name": "Orange",
+            "value": "bg-spectrum-orange-700"
+          },
+          {
+            "name": "Red",
+            "value": "bg-spectrum-red-700"
+          },
+          {
+            "name": "Celery",
+            "value": "bg-spectrum-celery-700"
+          },
+          {
+            "name": "Chartreuse",
+            "value": "bg-spectrum-chartreuse-700"
+          },
+          {
+            "name": "Cyan",
+            "value": "bg-spectrum-cyan-700"
+          },
+          {
+            "name": "Fuchsia",
+            "value": "bg-spectrum-fuchsia-700"
+          },
+          {
+            "name": "Indigo",
+            "value": "bg-spectrum-indigo-700"
+          },
+          {
+            "name": "Magenta",
+            "value": "bg-spectrum-magenta-700"
+          },
+          {
+            "name": "Purple",
+            "value": "bg-spectrum-purple-700"
+          },
+          {
+            "name": "Seafoam",
+            "value": "bg-spectrum-seafoam-700"
+          },
+          {
+            "name": "Yellow",
+            "value": "bg-spectrum-yellow-700"
           }
         ]
+      },
+      {
+        "component": "text-input",
+        "valueType": "string",
+        "name": "eyebrow",
+        "value": "",
+        "label": "Eyebrow",
+        "description": "Sets the small pre-title above the title."
+      },
+      {
+        "component": "text-input",
+        "valueType": "string",
+        "name": "title",
+        "value": "",
+        "label": "Heading",
+        "description": "Sets the main title of the sign-up."
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "titleType",
+        "value": "h3",
+        "label": "Heading Type",
+        "options": [
+          {
+            "name": "H1",
+            "value": "h1"
+          },
+          {
+            "name": "H2",
+            "value": "h2"
+          },
+          {
+            "name": "H3",
+            "value": "h3"
+          },
+          {
+            "name": "H4",
+            "value": "h4"
+          },
+          {
+            "name": "H5",
+            "value": "h5"
+          },
+          {
+            "name": "H6",
+            "value": "h6"
+          }
+        ]
+      },
+      {
+        "component": "text-area",
+        "valueType": "string",
+        "name": "longDescr",
+        "value": "",
+        "label": "Long Description",
+        "description": "The description shown in Desktop and Tablet view."
+      },
+      {
+        "component": "text-input",
+        "valueType": "string",
+        "name": "cta1Text",
+        "value": "",
+        "label": "Sign in CTA text",
+        "description": "Text to be shown inside button."
       },
       {
         "component": "text-input",
@@ -641,7 +1208,7 @@
       {
         "component": "text-input",
         "valueType": "string",
-        "name": "cta2Url",
+        "name": "cta2",
         "value": "",
         "label": "Second CTA Link",
         "description": "What link to open when clicking the button."
@@ -673,6 +1240,39 @@
         "description": "Sets the title for Secondary Search"
       },
       {
+        "component": "select",
+        "valueType": "string",
+        "name": "headingType",
+        "value": "h2",
+        "label": "Heading Type",
+        "options": [
+          {
+            "name": "H1",
+            "value": "h1"
+          },
+          {
+            "name": "H2",
+            "value": "h2"
+          },
+          {
+            "name": "H3",
+            "value": "h3"
+          },
+          {
+            "name": "H4",
+            "value": "h4"
+          },
+          {
+            "name": "H5",
+            "value": "h5"
+          },
+          {
+            "name": "H6",
+            "value": "h6"
+          }
+        ]
+      },
+      {
         "component": "text-input",
         "valueType": "string",
         "name": "searchBar",
@@ -697,6 +1297,35 @@
         "label": "Heading"
       },
       {
+        "component": "select",
+        "valueType": "string",
+        "name": "headingType",
+        "value": "h3",
+        "label": "Heading Type",
+        "options": [
+          {
+            "name": "H2",
+            "value": "h2"
+          },
+          {
+            "name": "H3",
+            "value": "h3"
+          },
+          {
+            "name": "H4",
+            "value": "h4"
+          },
+          {
+            "name": "H5",
+            "value": "h5"
+          },
+          {
+            "name": "H6",
+            "value": "h6"
+          }
+        ]
+      },
+      {
         "component": "text-area",
         "valueType": "string",
         "name": "body",
@@ -718,7 +1347,7 @@
       {
         "component": "text-input",
         "valueType": "string",
-        "name": "imageAlt",
+        "name": "fileReferenceAlt",
         "value": "",
         "label": "Image Description",
         "description": "A descriptive text of the image."
@@ -753,6 +1382,39 @@
         "name": "title",
         "value": "",
         "label": "Heading"
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "titleType",
+        "value": "h3",
+        "label": "Heading Type",
+        "options": [
+          {
+            "name": "H1",
+            "value": "h1"
+          },
+          {
+            "name": "H2",
+            "value": "h2"
+          },
+          {
+            "name": "H3",
+            "value": "h3"
+          },
+          {
+            "name": "H4",
+            "value": "h4"
+          },
+          {
+            "name": "H5",
+            "value": "h5"
+          },
+          {
+            "name": "H6",
+            "value": "h6"
+          }
+        ]
       },
       {
         "component": "text-area",
@@ -790,7 +1452,7 @@
       {
         "component": "text-input",
         "valueType": "string",
-        "name": "cta1Url",
+        "name": "cta1",
         "value": "",
         "label": "First CTA Link",
         "description": "What link to open when clicking the button."
@@ -805,7 +1467,7 @@
         "options": [
           {
             "name": "Primary",
-            "value": ""
+            "value": "primary"
           },
           {
             "name": "Secondary",
@@ -824,10 +1486,735 @@
       {
         "component": "text-input",
         "valueType": "string",
-        "name": "cta2Url",
+        "name": "cta2",
         "value": "",
         "label": "Second CTA Link",
         "description": "What link to open when clicking the button."
+      }
+    ]
+  },
+  {
+    "id": "authorable-card",
+    "fields": [
+      {
+        "component": "text-input",
+        "valueType": "string",
+        "name": "heading",
+        "value": "",
+        "label": "Heading",
+        "description": "Sets the heading."
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "headingType",
+        "value": "h2",
+        "label": "Heading Type",
+        "options": [
+          {
+            "name": "H1",
+            "value": "h1"
+          },
+          {
+            "name": "H2",
+            "value": "h2"
+          },
+          {
+            "name": "H3",
+            "value": "h3"
+          },
+          {
+            "name": "H4",
+            "value": "h4"
+          },
+          {
+            "name": "H5",
+            "value": "h5"
+          },
+          {
+            "name": "H6",
+            "value": "h6"
+          }
+        ]
+      },
+      {
+        "component": "text-input",
+        "valueType": "string",
+        "name": "tooltip",
+        "value": "",
+        "label": "Tooltip",
+        "description": "Sets the tooltip."
+      },
+      {
+        "component": "text-input",
+        "valueType": "string",
+        "name": "linkText",
+        "value": "",
+        "label": "Link text",
+        "description": "Sets the text for link."
+      },
+      {
+        "component": "text-input",
+        "valueType": "string",
+        "name": "link",
+        "value": "",
+        "label": "Link URL",
+        "description": "Sets the text url."
+      }
+    ]
+  },
+  {
+    "id": "authored-card",
+    "fields": [
+      {
+        "component": "text-input",
+        "valueType": "string",
+        "name": "contentURL",
+        "value": "",
+        "label": "Content URL",
+        "description": "Provide a link to one of the following content types: Course, Tutorial, Documentation, Troubleshooting, On-Demand Event, or Certification"
+      }
+    ]
+  },
+  {
+    "id": "browse-filters",
+    "fields": [
+      {
+        "component": "aem-tag",
+        "name": "solutions",
+        "label": "Results solution filter",
+        "valueType": "string",
+        "rootPath": "/content/cq:tags/exl/solution",
+        "description": "Optional - filter results to specific solution(s)."
+      },
+      {
+        "component": "text-input",
+        "valueType": "string",
+        "name": "heading",
+        "value": "",
+        "label": "Topics heading",
+        "description": "Sets the headings for topics."
+      },
+      {
+        "component": "aem-tag",
+        "name": "cq:tags",
+        "label": "Topics buttons",
+        "valueType": "string",
+        "rootPath": "/content/cq:tags/exl",
+        "description": "Select up to 15 topics or features."
+      }
+    ]
+  },
+  {
+    "id": "featured-cards",
+    "fields": [
+      {
+        "component": "text-input",
+        "name": "heading",
+        "value": "",
+        "label": "Heading",
+        "valueType": "string",
+        "description": "Sets the heading."
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "headingType",
+        "value": "h2",
+        "label": "Heading Type",
+        "options": [
+          {
+            "name": "H1",
+            "value": "h1"
+          },
+          {
+            "name": "H2",
+            "value": "h2"
+          },
+          {
+            "name": "H3",
+            "value": "h3"
+          },
+          {
+            "name": "H4",
+            "value": "h4"
+          },
+          {
+            "name": "H5",
+            "value": "h5"
+          },
+          {
+            "name": "H6",
+            "value": "h6"
+          }
+        ]
+      },
+      {
+        "component": "text-area",
+        "name": "description",
+        "value": "",
+        "label": "Description",
+        "valueType": "string",
+        "description": "Sets the description."
+      },
+      {
+        "component": "multiselect",
+        "valueType": "string",
+        "name": "contentTypes",
+        "label": "Content type(s)",
+        "description": "Select the content type(s).",
+        "options": [
+          {
+            "name": "Certification",
+            "value": "certification"
+          },
+          {
+            "name": "Communities",
+            "value": "community"
+          },
+          {
+            "name": "Courses",
+            "value": "course"
+          },
+          {
+            "name": "Documentation",
+            "value": "documentation"
+          },
+          {
+            "name": "On-Demand Event",
+            "value": "event"
+          },
+          {
+            "name": "Troubleshooting",
+            "value": "troubleshooting"
+          },
+          {
+            "name": "Tutorials",
+            "value": "tutorial"
+          }
+        ]
+      },
+      {
+        "component": "text-input",
+        "name": "linkText",
+        "value": "",
+        "label": "Link Text",
+        "valueType": "string",
+        "description": "Sets the text for link."
+      },
+      {
+        "component": "text-input",
+        "name": "link",
+        "value": "",
+        "label": "Link URL",
+        "valueType": "string",
+        "description": "Sets the text url."
+      },
+      {
+        "component": "text-input",
+        "name": "keyword",
+        "value": "",
+        "label": "Keyword",
+        "valueType": "string",
+        "description": "Keyword for filtering the featured card data"
+      },
+      {
+        "component": "radio-group",
+        "name": "sortBy",
+        "value": "RELEVANCE",
+        "label": "Sort by",
+        "valueType": "string",
+        "options": [
+          {
+            "name": "Relevance",
+            "value": "RELEVANCE"
+          },
+          {
+            "name": "Most recent",
+            "value": "MOST_RECENT"
+          },
+          {
+            "name": "Most popular",
+            "value": "MOST_POPULAR"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "events-cards",
+    "fields": [
+      {
+        "component": "text-input",
+        "valueType": "string",
+        "name": "heading",
+        "value": "",
+        "label": "Heading",
+        "description": "Sets the heading."
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "headingType",
+        "value": "h2",
+        "label": "Heading Type",
+        "options": [
+          {
+            "name": "H1",
+            "value": "h1"
+          },
+          {
+            "name": "H2",
+            "value": "h2"
+          },
+          {
+            "name": "H3",
+            "value": "h3"
+          },
+          {
+            "name": "H4",
+            "value": "h4"
+          },
+          {
+            "name": "H5",
+            "value": "h5"
+          },
+          {
+            "name": "H6",
+            "value": "h6"
+          }
+        ]
+      },
+      {
+        "component": "text-input",
+        "valueType": "string",
+        "name": "tooltip",
+        "value": "",
+        "label": "Tooltip",
+        "description": "Sets the tooltip."
+      },
+      {
+        "component": "text-input",
+        "valueType": "string",
+        "name": "linkText",
+        "value": "",
+        "label": "Link text",
+        "description": "Sets the text for link."
+      },
+      {
+        "component": "text-input",
+        "valueType": "string",
+        "name": "link",
+        "value": "",
+        "label": "Link URL",
+        "description": "Sets the text url."
+      },
+      {
+        "component": "aem-tag",
+        "name": "cq:tags",
+        "label": "Solution(s)",
+        "valueType": "string",
+        "rootPath": "/content/cq:tags/exl/solution",
+        "description": "Optional - all are included if no selection is made."
+      }
+    ]
+  },
+  {
+    "id": "adls-cards",
+    "fields": [
+      {
+        "component": "text-input",
+        "valueType": "string",
+        "name": "heading",
+        "value": "",
+        "label": "Heading",
+        "description": "Sets the heading."
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "headingType",
+        "value": "h2",
+        "label": "Heading Type",
+        "options": [
+          {
+            "name": "H1",
+            "value": "h1"
+          },
+          {
+            "name": "H2",
+            "value": "h2"
+          },
+          {
+            "name": "H3",
+            "value": "h3"
+          },
+          {
+            "name": "H4",
+            "value": "h4"
+          },
+          {
+            "name": "H5",
+            "value": "h5"
+          },
+          {
+            "name": "H6",
+            "value": "h6"
+          }
+        ]
+      },
+      {
+        "component": "text-input",
+        "valueType": "string",
+        "name": "tooltip",
+        "value": "",
+        "label": "Tooltip",
+        "description": "Sets the tooltip."
+      },
+      {
+        "component": "text-input",
+        "valueType": "string",
+        "name": "linkText",
+        "value": "",
+        "label": "Link text",
+        "description": "Sets the text for link."
+      },
+      {
+        "component": "text-input",
+        "valueType": "string",
+        "name": "link",
+        "value": "",
+        "label": "Link URL",
+        "description": "Sets the text url."
+      },
+      {
+        "component": "multiselect",
+        "valueType": "string",
+        "name": "solutions",
+        "label": "Solution(s)",
+        "description": "All are included if no selection is made",
+        "options": [
+          {
+            "name": "AEM Assets",
+            "value": "AEM Assets"
+          },
+          {
+            "name": "AEM Forms",
+            "value": "AEM Forms"
+          },
+          {
+            "name": "AEM Sites",
+            "value": "AEM Sites"
+          },
+          {
+            "name": "Analytics",
+            "value": "Analytics"
+          },
+          {
+            "name": "Audience Manager",
+            "value": "Audience Manager"
+          },
+          {
+            "name": "Campaign Classic",
+            "value": "Campaign Classic"
+          },
+          {
+            "name": "Campaign Standard",
+            "value": "Campaign Standard"
+          },
+          {
+            "name": "Commerce",
+            "value": "Commerce"
+          },
+          {
+            "name": "Content Supply Chain",
+            "value": "Content Supply Chain"
+          },
+          {
+            "name": "Customer Journey Analytics",
+            "value": "Customer Journey Analytics"
+          },
+          {
+            "name": "Experience Cloud Integrations",
+            "value": "Experience Cloud Integrations"
+          },
+          {
+            "name": "Experience Platform",
+            "value": "Experience Platform"
+          },
+          {
+            "name": "Journey Optimizer",
+            "value": "Journey Optimizer"
+          },
+          {
+            "name": "Marketo Engage",
+            "value": "Marketo Engage"
+          },
+          {
+            "name": "Real-Time CDP",
+            "value": "Real-Time CDP"
+          },
+          {
+            "name": "Target",
+            "value": "Target"
+          },
+          {
+            "name": "Workfront",
+            "value": "Workfront"
+          }
+        ]
+      },
+      {
+        "component": "multiselect",
+        "valueType": "string",
+        "name": "roles",
+        "label": "Role(s)",
+        "description": "All are included if no selection is made",
+        "options": [
+          {
+            "name": "Administrator",
+            "value": "Administrator"
+          },
+          {
+            "name": "Architect",
+            "value": "Architect"
+          },
+          {
+            "name": "Business User",
+            "value": "Business User"
+          },
+          {
+            "name": "Creative",
+            "value": "Creative"
+          },
+          {
+            "name": "Developer",
+            "value": "Developer"
+          }
+        ]
+      },
+      {
+        "component": "radio-group",
+        "name": "sortby",
+        "value": "recommended",
+        "label": "Sort by",
+        "description": "'Sorts baseed on the Options",
+        "valueType": "string",
+        "options": [
+          {
+            "name": "Recommended",
+            "value": "recommended"
+          },
+          {
+            "name": "Alphabetical (A-Z)",
+            "value": "ascending"
+          },
+          {
+            "name": "Alphabetical (Z-A)",
+            "value": "descending"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tabbed-cards",
+    "fields": [
+      {
+        "component": "text-input",
+        "valueType": "string",
+        "name": "heading",
+        "value": "",
+        "label": "Heading",
+        "description": "Sets the heading."
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "headingType",
+        "value": "h2",
+        "label": "Heading Type",
+        "options": [
+          {
+            "name": "H1",
+            "value": "h1"
+          },
+          {
+            "name": "H2",
+            "value": "h2"
+          },
+          {
+            "name": "H3",
+            "value": "h3"
+          },
+          {
+            "name": "H4",
+            "value": "h4"
+          },
+          {
+            "name": "H5",
+            "value": "h5"
+          },
+          {
+            "name": "H6",
+            "value": "h6"
+          }
+        ]
+      },
+      {
+        "component": "text-input",
+        "valueType": "string",
+        "name": "tooltip",
+        "value": "",
+        "label": "Tooltip",
+        "description": "Sets the tooltip."
+      },
+      {
+        "component": "multiselect",
+        "valueType": "string",
+        "name": "contentTypes",
+        "label": "Filter by Content Type",
+        "description": "Select the content type(s).",
+        "options": [
+          {
+            "name": "Courses",
+            "value": "course"
+          },
+          {
+            "name": "Tutorials",
+            "value": "tutorial"
+          },
+          {
+            "name": "Documentation",
+            "value": "documentation"
+          },
+          {
+            "name": "Troubleshooting",
+            "value": "troubleshooting"
+          },
+          {
+            "name": "On-Demand Events",
+            "value": "event"
+          },
+          {
+            "name": "Community Posts",
+            "value": "community"
+          },
+          {
+            "name": "Certification",
+            "value": "certification"
+          }
+        ]
+      },
+      {
+        "component": "radio-group",
+        "name": "sortBy",
+        "value": "most_recent",
+        "label": "Sort by",
+        "valueType": "string",
+        "options": [
+          {
+            "name": "Most Recent",
+            "value": "most_recent"
+          },
+          {
+            "name": "Most Popular",
+            "value": "most_popular"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tabs",
+    "fields": []
+  },
+  {
+    "id": "tab",
+    "fields": [
+      {
+        "component": "text-input",
+        "valueType": "string",
+        "name": "title",
+        "value": "",
+        "label": "Heading"
+      },
+      {
+        "component": "text-area",
+        "valueType": "string",
+        "name": "content",
+        "value": "",
+        "label": "Body"
+      }
+    ]
+  },
+  {
+    "id": "recommended-courses",
+    "fields": [
+      {
+        "component": "text-input",
+        "valueType": "string",
+        "name": "heading",
+        "value": "",
+        "label": "Heading",
+        "description": "Sets the heading."
+      },
+      {
+        "component": "select",
+        "valueType": "string",
+        "name": "headingType",
+        "value": "h2",
+        "label": "Heading Type",
+        "options": [
+          {
+            "name": "H1",
+            "value": "h1"
+          },
+          {
+            "name": "H2",
+            "value": "h2"
+          },
+          {
+            "name": "H3",
+            "value": "h3"
+          },
+          {
+            "name": "H4",
+            "value": "h4"
+          },
+          {
+            "name": "H5",
+            "value": "h5"
+          },
+          {
+            "name": "H6",
+            "value": "h6"
+          }
+        ]
+      },
+      {
+        "component": "text-input",
+        "valueType": "string",
+        "name": "tooltip",
+        "value": "",
+        "label": "Tooltip",
+        "description": "Sets the tooltip."
+      },
+      {
+        "component": "text-input",
+        "valueType": "string",
+        "name": "linkText",
+        "value": "",
+        "label": "Link text",
+        "description": "Sets the text for link."
+      },
+      {
+        "component": "text-input",
+        "valueType": "string",
+        "name": "link",
+        "value": "",
+        "label": "Link URL",
+        "description": "Sets the text url."
       }
     ]
   }

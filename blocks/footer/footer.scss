@@ -4,9 +4,15 @@
   border-top: 2px solid var(--non-spectrurm-whisper-gray);
   background-color: var(--footer-background-color);
   padding: 25px 0 20px;
+
+  @include breakpoint(desktop) {
+    min-height: 527px;
+  }
 }
 
 .footer {
+  --language-selector-display: block;
+
   margin: 0 auto;
   max-width: var(--non-spectrum-max-width);
   padding: 0;
@@ -134,6 +140,10 @@
     ul {
       display: block;
     }
+  }
+
+  .language-selector-button {
+    padding: 0;
   }
 
   &-lang-social {

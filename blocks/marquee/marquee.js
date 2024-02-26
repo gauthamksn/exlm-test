@@ -1,43 +1,72 @@
+/* eslint-disable no-plusplus */
 import { decorateIcons } from '../../scripts/lib-franklin.js';
+import { loadIms } from '../../scripts/scripts.js';
 
-export default function decorate(block) {
+function decorateButtons(...buttons) {
+  return buttons
+    .map((div, index) => {
+      if (div) {
+        const a = div.querySelector('a');
+        if (a) {
+          a.classList.add('button');
+          if (index === 0) a.classList.add('secondary');
+          if (index === 1) a.classList.add('primary');
+          return a.outerHTML;
+        }
+      }
+      return '';
+    })
+    .join('');
+}
+
+function getSignInButton(signInText) {
+  const secondCta = document.createElement('div');
+  const link = document.createElement('a');
+  link.classList.add('signin');
+  link.setAttribute('href', '#');
+  link.setAttribute('title', signInText);
+  link.textContent = signInText;
+  secondCta.append(link);
+  return secondCta;
+}
+
+export default async function decorate(block) {
   // Extract properties
   // always same order as in model, empty string if not set
-  const props = [...block.querySelectorAll(':scope div > div')];
+  const [img, eyebrow, title, longDescr, firstCta, confSignInText] = block.querySelectorAll(':scope div > div');
+  const subjectPicture = img.querySelector('picture');
+  const bgColorCls = [...block.classList].find((cls) => cls.startsWith('bg-'));
+  const bgColor = bgColorCls ? `--${bgColorCls.substr(3)}` : '--spectrum-gray-700';
+  const signInText = confSignInText.textContent.trim();
 
-  const subjectPicture = props[0].innerHTML.trim();
-  const subjectImageDescr = props[1].textContent.trim();
-  const bgColor = props[2].textContent.trim();
-  const eyebrow = props[3].textContent.trim();
-  const title = props[4].textContent.trim();
-  const longDescr = props[5].innerHTML.trim();
-  const firstCTAType = props[6].textContent.trim();
-  const firstCTAText = props[7].textContent.trim();
-  const firstCTALink = props[8].textContent.trim();
-  const secondCTAType = props[9].textContent.trim();
-  const secondCTAText = props[10].textContent.trim();
-  const secondCTALink = props[11].textContent.trim();
+  // get signed in status
+  try {
+    await loadIms();
+  } catch {
+    // eslint-disable-next-line no-console
+    console.warn('Adobe IMS not available.');
+  }
+  const isSignedIn = window.adobeIMS?.isSignedInUser();
+
+  // build sign in button if not in yet and button text is set
+  const secondCta = signInText && !isSignedIn ? getSignInButton(signInText) : null;
 
   // Build DOM
   const marqueeDOM = document.createRange().createContextualFragment(`
     <div class='marquee-foreground'>
       <div class='marquee-text'>
-        ${eyebrow ? `<div class='marquee-eyebrow'>${eyebrow.toUpperCase()}</div>` : ``}
-        <div class='marquee-title'>${title}</div>
-        <div class='marquee-long-description'>${longDescr}</div>
-        <div class='marquee-cta'>${
-          firstCTAText && firstCTALink
-            ? `<a class='button ${firstCTAType}' href='${firstCTALink}'>${firstCTAText}</a>`
+        ${
+          eyebrow.textContent.trim() !== ''
+            ? `<div class='marquee-eyebrow'>${eyebrow.textContent.trim().toUpperCase()}</div>`
             : ``
-        }${
-          secondCTAText && secondCTALink
-            ? `<a class='button ${secondCTAType}' href='${secondCTALink}'>${secondCTAText}</a>`
-            : ``
-        }</div>
+        }
+        <div class='marquee-title'>${title.innerHTML}</div>
+        <div class='marquee-long-description'>${longDescr.innerHTML}</div>
+        <div class='marquee-cta'>${decorateButtons(firstCta, secondCta)}</div>
       </div>
       ${
         subjectPicture
-          ? `<div class='marquee-subject' style="background-color : var(${bgColor})">${subjectPicture}</div>`
+          ? `<div class='marquee-subject' style="background-color : var(${bgColor})">${subjectPicture.outerHTML}</div>`
           : `<div class='marquee-spacer'></div>`
       }
       </div>
@@ -47,8 +76,11 @@ export default function decorate(block) {
     </div>
   `);
 
-  if (subjectPicture && subjectImageDescr) {
-    marqueeDOM.querySelector('.marquee-subject picture img').setAttribute('alt', subjectImageDescr);
+  // add sign in event handler for sign in if set
+  if (signInText && !isSignedIn) {
+    marqueeDOM.querySelector('.signin').addEventListener('click', async () => {
+      window.adobeIMS.signIn();
+    });
   }
 
   block.textContent = '';
