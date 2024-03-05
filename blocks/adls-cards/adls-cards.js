@@ -16,7 +16,7 @@ export default async function decorate(block) {
     (row) => row.firstElementChild,
   );
   const [solutions, roles, sortBy] = configs.map((cell) => cell.textContent.trim());
-  const contentType = CONTENT_TYPES.INSTRUCTOR_LED_TRANING.MAPPING_KEY;
+  const contentType = CONTENT_TYPES.INSTRUCTOR_LED.MAPPING_KEY;
   const noOfResults = 4;
 
   headingElement.firstElementChild?.classList.add('h2');
@@ -77,7 +77,6 @@ export default async function decorate(block) {
         block.appendChild(contentDiv);
         /* Hide Tooltip while scrolling the cards layout */
         hideTooltipOnScroll(contentDiv);
-        decorateIcons(block);
       }
     })
     .catch((err) => {

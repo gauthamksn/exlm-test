@@ -1,4 +1,9 @@
 import { fetchLanguagePlaceholders } from '../../scripts/scripts.js';
+import { COMMUNITY_SEARCH_FACET } from '../../scripts/browse-card/browse-cards-constants.js';
+
+const SUB_FACET_MAP = {
+  Community: COMMUNITY_SEARCH_FACET,
+};
 
 let placeholders = {};
 try {
@@ -141,19 +146,22 @@ const expLevel = [
 }));
 
 export const roleOptions = {
-  name: 'Role',
+  id: 'el_role',
+  name: placeholders.filterRoleLabel || 'Role',
   items: roles,
   selected: 0,
 };
 
 export const contentTypeOptions = {
-  name: 'Content Type',
+  id: 'el_contenttype',
+  name: placeholders.filterContentTypeLabel || 'Content Type',
   items: contentType,
   selected: 0,
 };
 
 export const expTypeOptions = {
-  name: 'Experience Level',
+  id: 'el_level',
+  name: placeholders.filterExperienceLevelLabel || 'Experience Level',
   items: expLevel,
   selected: 0,
 };
@@ -167,6 +175,10 @@ const FILTER_RESULTS_COUNT = {
 // Function to get an object by name
 export function getObjectByName(obj, name) {
   return obj.find((option) => option.name === name);
+}
+
+export function getObjectById(obj, ID) {
+  return obj.find((option) => option.id === ID);
 }
 
 export const getFiltersPaginationText = (pgCount) => `of ${pgCount} page${pgCount > 1 ? 's' : ''}`;
@@ -226,4 +238,24 @@ export const getParsedSolutionsQuery = (solutionTags) => {
     query: parsedSolutionsInfo.length > 1 ? `(${query})` : query,
     products: solutionInfo.map(({ product }) => product.toLowerCase()),
   };
+};
+
+export const getCoveoFacets = (type, value) => {
+  const subFacets = SUB_FACET_MAP[type];
+  if (!subFacets) {
+    return [
+      {
+        state: value ? 'selected' : 'idle',
+        value: type,
+      },
+    ];
+  }
+  return subFacets.reduce((acc, curr) => {
+    const { value: facetValue, state } = curr;
+    acc.push({
+      state: value ? state : 'idle',
+      value: `${type}|${facetValue}`,
+    });
+    return acc;
+  }, []);
 };

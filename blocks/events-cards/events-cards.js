@@ -30,7 +30,7 @@ export default async function decorate(block) {
 
   const [solutions] = configs.map((cell) => cell.textContent.trim());
 
-  const contentType = CONTENT_TYPES.LIVE_EVENTS.MAPPING_KEY;
+  const contentType = CONTENT_TYPES.LIVE_EVENT.MAPPING_KEY;
   const noOfResults = 4;
   const solutionsParam = solutions !== '' ? formattedSolutionTags(solutions) : '';
 
@@ -91,7 +91,6 @@ export default async function decorate(block) {
         block.appendChild(contentDiv);
         /* Hide Tooltip while scrolling the cards layout */
         hideTooltipOnScroll(contentDiv);
-        decorateIcons(contentDiv);
       }
     })
     .catch((err) => {

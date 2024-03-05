@@ -1,10 +1,13 @@
+import { isSignedInUser } from '../../scripts/data-service/profile-service.js';
 import { decorateIcons } from '../../scripts/lib-franklin.js';
-import { htmlToElement, loadIms, getPathDetails } from '../../scripts/scripts.js';
-import { khorosProxyProfileAPI } from '../../scripts/urls.js';
+import { htmlToElement, getPathDetails, fetchLanguagePlaceholders, decorateLinks } from '../../scripts/scripts.js';
 
 const languageModule = import('../../scripts/language.js');
 const authOperationsModule = import('../../scripts/auth/auth-operations.js');
 const searchModule = import('../../scripts/search/search.js');
+// Khoros Proxy URL (Determine the environment based on the host name)
+const environment = window.location.hostname === 'experienceleague.adobe.com' ? '' : '-dev';
+export const khorosProxyProfileAPI = `https://51837-exlmconverter${environment}.adobeioruntime.net/api/v1/web/main/khoros/plugins/custom/adobe/adobedx/profile-menu-list`;
 
 class Deferred {
   constructor() {
@@ -30,6 +33,14 @@ export const debounce = (ms, fn) => {
     timer = setTimeout(fn(args), ms);
   };
 };
+
+let placeholders = {};
+try {
+  placeholders = await fetchLanguagePlaceholders();
+} catch (err) {
+  // eslint-disable-next-line no-console
+  console.error('Error fetching placeholders:', err);
+}
 
 /**
  * Register page resize handler
@@ -65,10 +76,26 @@ function registerHeaderResizeHandler(callback) {
   callback();
 }
 
+const communityLocalesMap = new Map([
+  ['de', 'de'],
+  ['en', 'en'],
+  ['ja', 'ja'],
+  ['fr', 'fr'],
+  ['es', 'es'],
+  ['pt-br', 'pt'],
+  ['ko', 'ko'],
+  ['sv', 'en'],
+  ['nl', 'en'],
+  ['it', 'en'],
+  ['zh-hans', 'en'],
+  ['zh-hant', 'en'],
+]);
+
 // eslint-disable-next-line
 async function fetchCommunityProfileData() {
+  const locale = communityLocalesMap.get(document.querySelector('html').lang) || communityLocalesMap.get('en');
   try {
-    const response = await fetch(khorosProxyProfileAPI, {
+    const response = await fetch(`${khorosProxyProfileAPI}?lang=${locale}`, {
       method: 'GET',
       headers: {
         'x-ims-token': await window.adobeIMS?.getAccessToken().token,
@@ -150,17 +177,6 @@ const brandDecorator = (brandBlock) => {
   brandBlock.replaceChildren(brandLink);
   return brandBlock;
 };
-
-window.adobeIMS = window.adobeIMS || {
-  isSignedInUser: () => false,
-};
-try {
-  await loadIms();
-} catch {
-  // eslint-disable-next-line no-console
-  console.warn('Adobe IMS not available.');
-}
-const isSignedIn = window.adobeIMS?.isSignedInUser();
 
 /**
  * Function to toggle the navigation menu.
@@ -380,7 +396,7 @@ const navDecorator = async (navBlock) => {
 
   navBlock.firstChild.id = hamburger.getAttribute('aria-controls');
   navBlock.prepend(hamburger);
-
+  const isSignedIn = await isSignedInUser();
   if (!isSignedIn) {
     // hide auth-only nav items - see decorateLinks method for details
     [...navBlock.querySelectorAll('.nav-item')].forEach((navItemEl) => {
@@ -461,26 +477,12 @@ const searchDecorator = async (searchBlock) => {
     const searchItem = new Search({ searchBlock });
     searchItem.configureAutoComplete({
       searchOptions: options,
+      showSearchSuggestions: false,
     });
   };
   prepareSearch();
 
   return searchBlock;
-};
-
-/**
- * Decorates the sign-up block
- * @param {HTMLElement} signUpBlock
- */
-const signUpDecorator = (signUpBlock) => {
-  simplifySingleCellBlock(signUpBlock);
-  if (isSignedIn) {
-    signUpBlock.style.display = 'none';
-  } else {
-    signUpBlock.firstChild.addEventListener('click', async () => {
-      window.adobeIMS.signUp();
-    });
-  }
 };
 
 /**
@@ -519,6 +521,7 @@ const languageDecorator = async (languageBlock) => {
 
 const signInDecorator = async (signInBlock) => {
   simplifySingleCellBlock(signInBlock);
+  const isSignedIn = await isSignedInUser();
   if (isSignedIn) {
     signInBlock.classList.add('signed-in');
     signInBlock.replaceChildren(
@@ -598,18 +601,16 @@ const signInDecorator = async (signInBlock) => {
 
 const productGridDecorator = async (productGridBlock) => {
   simplifySingleCellBlock(productGridBlock);
+  const isSignedIn = await isSignedInUser();
   if (isSignedIn) {
     productGridBlock.classList.add('signed-in');
     const productDropdown = document.createElement('div');
     productDropdown.classList.add('product-dropdown');
-    const pTags = productGridBlock.querySelectorAll('p');
-    if (pTags.length > 0) {
-      pTags.forEach((p) => {
-        const anchor = p.querySelector('a');
-        anchor.setAttribute('target', '_blank');
-        const href = anchor.getAttribute('href').split('#');
-        anchor.setAttribute('href', href[0]);
-        productDropdown.innerHTML += p.innerHTML;
+    const aTags = productGridBlock.querySelectorAll('a');
+    if (aTags.length > 0) {
+      aTags.forEach((a) => {
+        a.setAttribute('target', '_blank');
+        productDropdown.append(a);
       });
     }
     const productToggle = document.createElement('button');
@@ -631,10 +632,7 @@ const productGridDecorator = async (productGridBlock) => {
     };
 
     registerHeaderResizeHandler(() => {
-      if (isMobile()) {
-        // if mobile, hide product grid block
-        gridToggler.style.display = 'none';
-      } else {
+      if (!isMobile()) {
         // if desktop, add mouseenter/mouseleave, remove click event
         gridToggler.parentElement.addEventListener('mouseenter', toggleExpandGridContent);
         gridToggler.parentElement.addEventListener('mouseleave', toggleExpandGridContent);
@@ -655,6 +653,7 @@ const productGridDecorator = async (productGridBlock) => {
  */
 
 const profileMenuDecorator = async (profileMenuBlock) => {
+  const isSignedIn = await isSignedInUser();
   if (isSignedIn) {
     simplifySingleCellBlock(profileMenuBlock);
     profileMenuBlock.querySelectorAll('p').forEach((ptag) => {
@@ -664,9 +663,11 @@ const profileMenuDecorator = async (profileMenuBlock) => {
     });
     const profileMenuWrapper = document.querySelector('.profile-menu');
     const communityHeading = document.createElement('h2');
-    communityHeading.textContent = 'Community';
+    communityHeading.textContent = placeholders?.headerCommunityLabel || 'Community';
     if (profileMenuWrapper) {
-      profileMenuWrapper.innerHTML = `<h2>Learning</h2>${profileMenuBlock.innerHTML}`;
+      profileMenuWrapper.innerHTML = `<h2>${placeholders?.headerLearningLabel || 'Learning'}</h2>${
+        profileMenuBlock.innerHTML
+      }`;
       profileMenuWrapper.lastElementChild.setAttribute('data-id', 'sign-out');
       profileMenuWrapper.insertBefore(communityHeading, profileMenuWrapper.lastElementChild);
     }
@@ -724,30 +725,6 @@ const decorateNewTabLinks = (block) => {
 };
 
 /**
- * Links that have urls with JSON the hash, the JSON will be translated to attributes
- * eg <a href="https://example.com#{"target":"_blank", "auth-only": "true"}">link</a>
- * will be translated to <a href="https://example.com" target="_blank" auth-only="true">link</a>
- * @param {HTMLElement} block
- */
-const decorateLinks = (block) => {
-  const links = block.querySelectorAll('a');
-  links.forEach((link) => {
-    const decodedHref = decodeURIComponent(link.getAttribute('href'));
-    const firstCurlyIndex = decodedHref.indexOf('{');
-    const lastCurlyIndex = decodedHref.lastIndexOf('}');
-    if (firstCurlyIndex > -1 && lastCurlyIndex > -1) {
-      // everything between curly braces is treated as JSON string.
-      const optionsJsonStr = decodedHref.substring(firstCurlyIndex, lastCurlyIndex + 1);
-      Object.entries(JSON.parse(optionsJsonStr)).forEach(([key, value]) => {
-        link.setAttribute(key.trim(), value);
-      });
-      // remove the JSON string from the hash, if JSON string is the only thing in the hash, remove the hash as well.
-      const endIndex = decodedHref.charAt(firstCurlyIndex - 1) === '#' ? firstCurlyIndex - 1 : firstCurlyIndex;
-      link.href = decodedHref.substring(0, endIndex);
-    }
-  });
-};
-/**
  * Main header decorator, calls all the other decorators
  * @param {HTMLElement} headerBlock
  */
@@ -776,7 +753,6 @@ export default async function decorate(headerBlock) {
 
   decorateHeaderBlock('brand', brandDecorator);
   decorateHeaderBlock('search', searchDecorator);
-  decorateHeaderBlock('sign-up', signUpDecorator);
   decorateHeaderBlock('language-selector', languageDecorator);
   decorateHeaderBlock('product-grid', productGridDecorator);
   decorateHeaderBlock('sign-in', signInDecorator);

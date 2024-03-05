@@ -65,9 +65,8 @@ const BrowseCardsCoveoDataAdaptor = (() => {
     }
     const tags = createTags(result, contentType.toLowerCase());
     let url = parentResult?.clickUri || parentResult?.uri || clickUri || uri || '';
-    if (contentType.toLowerCase() !== CONTENT_TYPES.COURSE.MAPPING_KEY) {
-      url = rewriteDocsPath(url, true);
-    }
+    url = rewriteDocsPath(url);
+    const contentTypeTitleCase = convertToTitleCase(contentType?.toLowerCase());
 
     return {
       ...browseCardDataModel,
@@ -86,7 +85,7 @@ const BrowseCardsCoveoDataAdaptor = (() => {
       tags,
       copyLink: url,
       viewLink: url,
-      viewLinkText: placeholders[`viewLink${convertToTitleCase(contentType)}`] || 'View',
+      viewLinkText: placeholders[`browseCard${contentTypeTitleCase}ViewLabel`] || 'View',
     };
   };
 

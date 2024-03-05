@@ -178,10 +178,12 @@ function addBrowseRail(main) {
 }
 
 function addBrowseBreadCrumb(main) {
-  // add new section at the top
-  const section = document.createElement('div');
-  main.prepend(section);
-  section.append(buildBlock('browse-breadcrumb', []));
+  if (!main.querySelector('.browse-breadcrumb.block')) {
+    // add new section at the top
+    const section = document.createElement('div');
+    main.prepend(section);
+    section.append(buildBlock('browse-breadcrumb', []));
+  }
 }
 
 /**
@@ -257,6 +259,33 @@ export function decorateExternalLinks(main) {
     }
   });
 }
+
+/**
+ * Links that have urls with JSON the hash, the JSON will be translated to attributes
+ * eg <a href="https://example.com#{"target":"_blank", "auth-only": "true"}">link</a>
+ * will be translated to <a href="https://example.com" target="_blank" auth-only="true">link</a>
+ * @param {HTMLElement} block
+ */
+export const decorateLinks = (block) => {
+  const links = block.querySelectorAll('a');
+  links.forEach((link) => {
+    const decodedHref = decodeURIComponent(link.getAttribute('href'));
+    const firstCurlyIndex = decodedHref.indexOf('{');
+    const lastCurlyIndex = decodedHref.lastIndexOf('}');
+    if (firstCurlyIndex > -1 && lastCurlyIndex > -1) {
+      // everything between curly braces is treated as JSON string.
+      const optionsJsonStr = decodedHref.substring(firstCurlyIndex, lastCurlyIndex + 1);
+      const fixedJsonString = optionsJsonStr.replace(/'/g, '"'); // JSON.parse function expects JSON strings to be formatted with double quotes
+      const parsedJSON = JSON.parse(fixedJsonString);
+      Object.entries(parsedJSON).forEach(([key, value]) => {
+        link.setAttribute(key.trim(), value);
+      });
+      // remove the JSON string from the hash, if JSON string is the only thing in the hash, remove the hash as well.
+      const endIndex = decodedHref.charAt(firstCurlyIndex - 1) === '#' ? firstCurlyIndex - 1 : firstCurlyIndex;
+      link.href = decodedHref.substring(0, endIndex);
+    }
+  });
+};
 
 /**
  * Check if current page is a MD Docs Page.
@@ -376,10 +405,9 @@ export const locales = new Map([
   ['zh-Hans', 'zh_HANS'],
 ]);
 
-let imsLoaded;
 export async function loadIms() {
-  imsLoaded =
-    imsLoaded ||
+  window.imsLoaded =
+    window.imsLoaded ||
     new Promise((resolve, reject) => {
       const timeout = setTimeout(() => reject(new Error('IMS timeout')), 5000);
       window.adobeid = {
@@ -398,25 +426,10 @@ export async function loadIms() {
       };
       loadScript('https://auth.services.adobe.com/imslib/imslib.min.js');
     });
-  return imsLoaded;
+  return window.imsLoaded;
 }
 
-/**
- * Loads everything that doesn't need to be delayed.
- * @param {Element} doc The container element
- */
-async function loadLazy(doc) {
-  const main = doc.querySelector('main');
-  await loadBlocks(main);
-  loadIms(); // start it early, asyncronously
-
-  const { hash } = window.location;
-  const element = hash ? doc.getElementById(hash.substring(1)) : false;
-  const { lang } = getPathDetails();
-  if (hash && element) element.scrollIntoView();
-  const headerPromise = loadHeader(doc.querySelector('header'));
-  const footerPromise = loadFooter(doc.querySelector('footer'));
-
+const loadMartech = async (headerPromise, footerPromise) => {
   let launchScriptSrc = '';
   if (window.location.host === 'eds-stage.experienceleague.adobe.com') {
     launchScriptSrc = 'https://assets.adobedtm.com/a7d65461e54e/6e9802a06173/launch-dbb3f007358e-staging.min.js';
@@ -425,8 +438,9 @@ async function loadLazy(doc) {
   } else {
     launchScriptSrc = 'https://assets.adobedtm.com/a7d65461e54e/6e9802a06173/launch-e6bd665acc0a-development.min.js';
   }
+  oneTrust();
 
-  const oneTrustPromise = loadScript(`/scripts/analytics/privacy-standalone.js`, {
+  const oneTrustPromise = loadScript(`${window.hlx.codeBasePath}/scripts/analytics/privacy-standalone.js`, {
     async: true,
     defer: true,
   });
@@ -438,8 +452,8 @@ async function loadLazy(doc) {
   Promise.all([launchPromise, libAnalyticsModulePromise, headerPromise, footerPromise, oneTrustPromise]).then(
     // eslint-disable-next-line no-unused-vars
     ([launch, libAnalyticsModule, headPr, footPr]) => {
+      const { lang } = getPathDetails();
       const { pageLoadModel, linkClickModel, pageName } = libAnalyticsModule;
-      oneTrust();
       document.querySelector('[href="#onetrust"]').addEventListener('click', (e) => {
         e.preventDefault();
         window.adobePrivacy.showConsentPopup();
@@ -453,7 +467,7 @@ async function loadLazy(doc) {
           console.error('Error getting pageLoadModel:', e);
         });
       localStorage.setItem('prevPage', pageName(lang));
-      const linkClicked = document.querySelectorAll('a,.view-more-less span');
+      const linkClicked = document.querySelectorAll('a,.view-more-less span, .language-selector-popover span');
       linkClicked.forEach((linkElement) => {
         linkElement.addEventListener('click', (e) => {
           if (e.target.tagName === 'A' || e.target.tagName === 'SPAN') {
@@ -463,10 +477,26 @@ async function loadLazy(doc) {
       });
     },
   );
+};
 
+/**
+ * Loads everything that doesn't need to be delayed.
+ * @param {Element} doc The container element
+ */
+async function loadLazy(doc) {
+  const main = doc.querySelector('main');
+  await loadBlocks(main);
+  loadIms(); // start it early, asyncronously
+
+  const { hash } = window.location;
+  const element = hash ? doc.getElementById(hash.substring(1)) : false;
+  if (hash && element) element.scrollIntoView();
+  const headerPromise = loadHeader(doc.querySelector('header'));
+  const footerPromise = loadFooter(doc.querySelector('footer'));
+  // disable martech if martech=off is in the query string, this is used for testing ONLY
+  if (window.location.search?.indexOf('martech=off') === -1) loadMartech(headerPromise, footerPromise);
   loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
   loadFonts();
-
   sampleRUM('lazy');
 }
 
@@ -502,70 +532,6 @@ export function htmlToElement(html) {
   const trimmedHtml = html.trim(); // Never return a text node of whitespace as the result
   template.innerHTML = trimmedHtml;
   return template.content.firstElementChild;
-}
-
-export async function loadPrevNextBtn() {
-  let placeholders = {};
-  try {
-    // eslint-disable-next-line no-use-before-define
-    placeholders = await fetchLanguagePlaceholders();
-  } catch (err) {
-    // eslint-disable-next-line no-console
-    console.error('Error fetching placeholders:', err);
-  }
-  const mainDoc = document.querySelector('main > div.content-section-last');
-  if (!mainDoc) return;
-
-  const prevPageMeta = document.querySelector('meta[name="prev-page"]');
-  const nextPageMeta = document.querySelector('meta[name="next-page"]');
-  const prevPageMetaContent = prevPageMeta?.getAttribute('content').trim().split('.html')[0];
-  const nextPageMetaContent = nextPageMeta?.getAttribute('content').trim().split('.html')[0];
-  const PREV_PAGE = placeholders?.previousPage;
-  const NEXT_PAGE = placeholders?.nextPage;
-
-  if (prevPageMeta || nextPageMeta) {
-    if (prevPageMetaContent === '' && nextPageMetaContent === '') return;
-
-    const docPagination = createTag('div', { class: 'doc-pagination' });
-    const btnGotoLeft = createTag('div', { class: 'btn-goto is-left-desktop' });
-
-    const anchorLeftAttr = {
-      // eslint-disable-next-line no-use-before-define
-      href: `${rewriteDocsPath(prevPageMetaContent)}`,
-      class: 'pagination-btn',
-    };
-    const anchorLeft = createTag('a', anchorLeftAttr);
-    const spanLeft = createTag('span', '', PREV_PAGE);
-
-    anchorLeft.append(spanLeft);
-    btnGotoLeft.append(anchorLeft);
-
-    const btnGotoRight = createTag('div', {
-      class: 'btn-goto is-right-desktop',
-    });
-
-    const anchorRightAttr = {
-      // eslint-disable-next-line no-use-before-define
-      href: `${rewriteDocsPath(nextPageMetaContent)}`,
-      class: 'pagination-btn',
-    };
-    const anchorRight = createTag('a', anchorRightAttr);
-    const spanRight = createTag('span', '', NEXT_PAGE);
-
-    anchorRight.append(spanRight);
-    btnGotoRight.append(anchorRight);
-
-    if (!prevPageMeta || prevPageMetaContent === '') {
-      anchorLeft.classList.add('is-disabled');
-    }
-
-    if (!nextPageMeta || nextPageMetaContent === '') {
-      anchorRight.classList.add('is-disabled');
-    }
-
-    docPagination.append(btnGotoLeft, btnGotoRight);
-    mainDoc.append(docPagination);
-  }
 }
 
 /**
@@ -623,20 +589,6 @@ function showBrowseBackgroundGraphic() {
   }
 }
 
-async function loadPage() {
-  await loadEager(document);
-  await loadLazy(document);
-  loadRails();
-  loadDelayed();
-  showBrowseBackgroundGraphic();
-  await loadPrevNextBtn();
-}
-
-// load the page unless DO_NOT_LOAD_PAGE is set - used for existing EXLM pages POC
-if (!window.hlx.DO_NOT_LOAD_PAGE) {
-  loadPage();
-}
-
 /**
  * Helper function that converts an AEM path into an EDS path.
  */
@@ -665,7 +617,7 @@ export const toPascalCase = (name) => `${(name || '').charAt(0).toUpperCase()}${
 export function rewriteDocsPath(docsPath) {
   const PROD_BASE = 'https://experienceleague.adobe.com';
   const url = new URL(docsPath, PROD_BASE);
-  if (!url.pathname.startsWith('/docs')) {
+  if (!url.pathname.startsWith('/docs') || url.pathname.startsWith('/docs/courses/')) {
     return docsPath; // not a docs path, return as is
   }
   // eslint-disable-next-line no-use-before-define
@@ -678,68 +630,23 @@ export function rewriteDocsPath(docsPath) {
   return url.toString().replace(PROD_BASE, ''); // always remove PROD_BASE if exists
 }
 
-/**
- * Helper function thats returns a list of all products
- * - below <lang>/browse/<product-page>
- * - To get added, the product page must be published
- * - Product pages listed in <lang>/browse/top-products are put at the the top
- *   in the order they appear in top-products
- * - the top product list can point to sub product pages
- */
-export async function getProducts() {
-  // get language
-  const { lang } = getPathDetails();
-  const ffetch = (await ffetchModulePromise).default;
-  // load the <lang>/top_product list
-  const topProducts = await ffetch(`/${lang}/top-products.json`).all();
-  // get all indexed pages below <lang>/browse
-  const publishedPages = await ffetch(`/${lang}/browse-index.json`).all();
-
-  // add all published top products to final list
-  const finalProducts = topProducts.filter((topProduct) => {
-    // check if top product is in published list
-    const found = publishedPages.find((elem) => elem.path === topProduct.path);
-    if (found) {
-      // keep original title if no nav title is set
-      if (!topProduct.title) topProduct.title = found.title;
-      // set marker for featured product
-      topProduct.featured = true;
-      // remove it from publishedProducts list
-      publishedPages.splice(publishedPages.indexOf(found), 1);
-      return true;
-    }
-    return false;
-  });
-
-  // for the rest only keep main product pages (<lang>/browse/<main-product-page>)
-  const publishedMainProducts = publishedPages
-    .filter((page) => page.path.split('/').length === 4)
-    // sort alphabetically
-    .sort((productA, productB) => productA.path.localeCompare(productB.path));
-  // append remaining published products to final list
-  finalProducts.push(...publishedMainProducts);
-  return finalProducts;
-}
-
 export async function fetchLanguagePlaceholders() {
   const { lang } = getPathDetails();
-  let placeholdersData = '';
-
   try {
     // Try fetching placeholders with the specified language
-    placeholdersData = await fetchPlaceholders(`/${lang}`);
+    return await fetchPlaceholders(`/${lang}`);
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.error(`Error fetching placeholders for lang: ${lang}`, error);
+    console.error(`Error fetching placeholders for lang: ${lang}. Will try to get en placeholders`, error);
     // Retry without specifying a language (using the default language)
     try {
-      placeholdersData = await fetchPlaceholders('/en');
+      return await fetchPlaceholders('/en');
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error('Error fetching placeholders:', err);
     }
   }
-  return placeholdersData;
+  return {}; // default to empty object
 }
 
 export async function getLanguageCode() {
@@ -749,4 +656,28 @@ export async function getLanguageCode() {
   const langObj = langMap.find((item) => item.key === lang);
   const langCode = langObj ? langObj.value : lang;
   return langCode;
+}
+
+async function loadDefaultModule(jsPath) {
+  try {
+    const mod = await import(jsPath);
+    if (mod.default) await mod.default();
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.log(`failed to load module for ${jsPath}`, error);
+  }
+}
+
+async function loadPage() {
+  await loadEager(document);
+  await loadLazy(document);
+  loadRails();
+  loadDelayed();
+  showBrowseBackgroundGraphic();
+  loadDefaultModule(`${window.hlx.codeBasePath}/scripts/prev-next-btn.js`);
+}
+
+// load the page unless DO_NOT_LOAD_PAGE is set - used for existing EXLM pages POC
+if (!window.hlx.DO_NOT_LOAD_PAGE) {
+  loadPage();
 }

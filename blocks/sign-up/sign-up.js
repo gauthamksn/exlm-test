@@ -1,5 +1,5 @@
+import { isSignedInUser } from '../../scripts/data-service/profile-service.js';
 import { decorateIcons } from '../../scripts/lib-franklin.js';
-import { loadIms } from '../../scripts/scripts.js';
 
 function decorateButtons(...buttons) {
   return buttons
@@ -81,19 +81,11 @@ export default async function decorate(block) {
 
   if (signUpBtn) {
     signUpBtn.addEventListener('click', async () => {
-      window.adobeIMS.signIn();
+      window.adobeIMS.signUp();
     });
   }
 
-  // check if user is signed in
-  try {
-    await loadIms();
-  } catch {
-    // eslint-disable-next-line no-console
-    console.warn('Adobe IMS not available.');
-  }
-
-  const isUserSignedIn = window.adobeIMS?.isSignedInUser();
+  const isUserSignedIn = await isSignedInUser();
 
   // if not signed in or in UE edit mode
   if (!isUserSignedIn || document.documentElement.classList.contains('adobe-ue-edit')) {
